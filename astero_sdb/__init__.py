@@ -29,7 +29,7 @@ class Star:
         self.feh_err_m = feh_err_m
         if frequencies_list:
             self.frequencies = np.genfromtxt(
-                self.name, dtype=None, skip_header=1, names=True)
+                frequencies_list, dtype=None, skip_header=1, names=True)
         else:
             self.frequencies = None
 
@@ -37,7 +37,7 @@ class Star:
 
     def __str__(self):
         return f"{self.name}"
-    
+
     def __repr__(self):
         return (
             f"Star({self.name}, "
