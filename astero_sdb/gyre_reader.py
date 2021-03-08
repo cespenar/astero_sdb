@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class GyreData():
 
     """Structure containing data from a GYRE output file.
@@ -36,6 +37,7 @@ class GyreData():
         List of all available header names.
     """
 
+    seconds_in_day = 86400
     header_names_line = 3
     body_names_line = 6
 
@@ -78,13 +80,13 @@ class GyreData():
 
     def read_gyre(self):
         """Reads data from a GYRE output file.
-        
+
         Parameters
         ----------
 
         Returns
         ----------
-        
+
         """
 
         self.body_data = np.genfromtxt(
@@ -181,3 +183,60 @@ class GyreData():
             return self.body_data[key]
         else:
             raise KeyError(f"{key:s} is not a valid data type")
+
+    def periods(self, l, g_modes_only=False, use_seconds=True):
+        """Calculates periods from calculated freuencies given
+        in c/d.
+
+        Parameters
+        ----------
+        l : int
+            Spherical degree of modes.
+        g_modes_only : bool, optional
+            If True calculates periods only for g-modes. Default: False.
+        use_seconds : bool, optional
+            Results in seconds if true, otherwise in days. Default: True.
+
+        Returns
+        ----------
+        periods : numpy.ndarray
+            Numpy array of periods.
+        """
+
+        if g_modes_only:
+            selection = (self.data('l') == l) & (self.data("n_pg") < 0)
+        else:
+            selection = (self.data('l') == l)
+
+        if use_seconds:
+            periods = 1.0 / \
+                self.data('Refreq')[selection] * self.seconds_in_day
+        else:
+            periods = 1.0 / self.data('Refreq')[selection]
+
+        return periods
+
+    def deltaP(self, l, use_seconds=True, reduced=False):
+        """Calculates perdiod spacing sequence for g-modes.
+
+        Parameters
+        ----------
+        l : int
+            Mode's spherical degree.
+        use_seconds : bool, optional
+            Results in seconds if true, otherwise in days. Default: True.
+        reduced : bool, optional
+            If true calculates reduced periods, otherwise calculates periods.
+            Default: False.
+
+        Returns
+        ----------
+        deltaP : numpy.ndarray
+            Numpy array with period spacing.
+        """
+
+        l_factor = np.sqrt(l * (l + 1)) if reduced else 1.0
+        periods = l_factor * self.periods(l=l, g_modes_only=True, use_seconds=use_seconds) 
+        deltaP = periods[0:len(periods)-1] - periods[1:]
+        return deltaP
+        
