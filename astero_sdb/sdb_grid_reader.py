@@ -9,6 +9,8 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from .gyre_reader import GyreData
+from .star import Star
+
 
 class SdbGrid():
     """Structure containing a processed MESA grid of sdB stars.
@@ -444,6 +446,74 @@ class SdbGrid():
             else:
                 return False
 
+    def df_from_errorbox(self, star, sigma=1.0,
+                         use_teff=True, use_logg=True,
+                         use_vrot=False, use_feh=False,
+                         use_z_surf=False):
+        """Selects models based on the observational
+        parameters of a star.
+
+        Parameters
+        ----------
+        star : Star
+            A star for which models are selected.
+        sigma : float, optional
+            Size of the considered error box expressed
+            as a multiplier of error.
+            Default: 1.0.
+        use_teff : bool, optional
+            If True uses effective temperature for selection.
+            Default: True.
+        use_logg : bool, optional
+            If True uses log_g for selection.
+            Default: True.
+        use_vrot : bool, optional
+            If True uses rotational velocity for selection.
+            Default: False.
+        use_feh : bool, optional
+            If True uses metallicity for selection.
+            Default: False.
+        use_z_surf : bool, optional
+            If True uses surface Z for selection of [Fe/H], otherwise
+            uses initial Z of progenitor.
+            Default: False.
+
+        Returns
+        ----------
+        DaraFrame
+            Dataframe containing the selected models.
+        """
+
+        c = True
+
+        if use_teff:
+            c_teff = (10.0 ** self.data.log_Teff <= star.t_eff + sigma*star.t_eff_err_p) & \
+                (10.0 ** self.data.log_Teff >= star.t_eff - sigma*star.t_eff_err_m)
+            c &= c_teff
+
+        if use_logg:
+            c_logg = (self.data.log_g <= star.log_g + sigma*star.log_g_err_p) & \
+                (self.data.log_g >= star.log_g - sigma*star.log_g_err_m)
+            c &= c_logg
+
+        if use_vrot:
+            c_vrot = (self.data.rot <= star.v_rot + sigma*star.v_rot_err_p) & \
+                (self.data.rot >= star.v_rot - sigma*star.v_rot_err_m)
+            c &= c_vrot
+
+        if use_feh:
+            if use_z_surf:
+                c_feh = (self.calc_feh(self.data.z_surf) <= star.feh + sigma*star.feh_err_p) & \
+                    (self.calc_feh(self.data.z_surf) >=
+                     star.feh - sigma*star.feh_err_m)
+            else:
+                c_feh = (self.calc_feh(self.data.z_i) <= star.feh + sigma*star.feh_err_p) & \
+                    (self.calc_feh(self.data.z_i) >=
+                     star.feh - sigma*star.feh_err_m)
+            c &= c_feh
+
+        return self.data[c]
+
     @staticmethod
     def model_extracted(path):
         """Checks if model is already exracted.
@@ -531,3 +601,30 @@ class SdbGrid():
         """
 
         return f"custom_He{round(he4, 6)}.data.GYRE"
+
+    @staticmethod
+    def calc_feh(z):
+        """Calculates [Fe/H] from metallicity.
+        Assumes solar chemical compostion from Asplund et al. (2009).
+
+        Parameters
+        ----------
+        z : float
+            Metallicity.
+
+        Returns
+        ----------
+        float
+            Calculated [Fe/H].
+        """
+
+        solar_h1 = 0.7154
+        solar_h2 = 1.43e-5
+        solar_he3 = 4.49e-5
+        solar_he4 = 0.2702551
+
+        solar_x = solar_h1 + solar_h2
+        solar_y = solar_he3 + solar_he4
+        solar_z = 1.0 - solar_x - solar_y
+
+        return np.log10(z/solar_z)
