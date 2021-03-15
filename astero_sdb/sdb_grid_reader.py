@@ -2,7 +2,6 @@ import os
 import shutil
 from zipfile import ZipFile
 
-import matplotlib.pyplot as plt
 import mesa_reader as mesa
 import numpy as np
 import pandas as pd
@@ -30,7 +29,7 @@ class SdbGrid():
         Path to the input database. 
     grid_dir : str
         Path to the directory containing the zipped grid of models.
-    data : DataFrame
+    data : pandas.DataFrame
         Pandas DataFrame containing the grid.
 
     Examples
