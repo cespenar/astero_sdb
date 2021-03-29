@@ -8,7 +8,6 @@ import pandas as pd
 from sqlalchemy import create_engine
 
 from .gyre_reader import GyreData
-from .star import Star
 
 
 class SdbGrid():

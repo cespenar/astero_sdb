@@ -1,8 +1,5 @@
 import numpy as np
 
-from .sdb_grid_reader import SdbGrid
-from .star import Star
-
 
 def calc_feh(z):
     """Calculates [Fe/H] from metallicity.
@@ -77,33 +74,56 @@ def chi2_star(star, grid, use_z_surf=True):
 
     if star.t_eff:
         grid.chi2_star += chi2_single(x_model=10.0 ** grid.log_Teff,
-                                    x_obs=star.t_eff,
-                                    sigma=star.t_eff_err_p
-                                    )
+                                      x_obs=star.t_eff,
+                                      sigma=star.t_eff_err_p
+                                      )
 
     if star.log_g:
         grid.chi2_star += chi2_single(x_model=grid.log_g,
-                                    x_obs=star.log_g,
-                                    sigma=star.log_g_err_p
-                                    )
+                                      x_obs=star.log_g,
+                                      sigma=star.log_g_err_p
+                                      )
 
     if star.v_rot:
         grid.chi2_star += chi2_single(x_model=grid.rot,
-                                    x_obs=star.v_rot,
-                                    sigma=star.v_rot_err_p
-                                    )
+                                      x_obs=star.v_rot,
+                                      sigma=star.v_rot_err_p
+                                      )
 
     if star.feh:
         if use_z_surf:
             grid.chi2_star += chi2_single(x_model=calc_feh(grid.z_surf),
-                                        x_obs=star.feh,
-                                        sigma=star.feh_err_p
-                                        )
+                                          x_obs=star.feh,
+                                          sigma=star.feh_err_p
+                                          )
         else:
             grid.chi2_star += chi2_single(x_model=calc_feh(grid.z_i),
-                                        x_obs=star.feh,
-                                        sigma=star.feh_err_p
-                                        )
+                                          x_obs=star.feh,
+                                          sigma=star.feh_err_p
+                                          )
+
+
+def chi2_puls(star, grid, use_z_surf=True):
+    """Calculates chi^2 function for a star
+    and a grid using availiable pulsation periods.
+
+    Parameters
+    ----------
+    star : Star
+        A star for which chi^2 function is calculated.
+    grid : pandas.DataFrame
+        Pandas DataFrame containing the grid.
+    use_z_surf : bool, optional
+        If True uses surface Z for selection of [Fe/H],
+        otherwise uses initial Z of progenitor.
+        Default: True.
+
+    Returns
+    -------
+
+    """
+
+    pass
 
 
 if __name__ == "__main__":
