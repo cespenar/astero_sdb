@@ -1,5 +1,7 @@
 import numpy as np
 
+from astero_sdb.star import Star
+
 
 def calc_feh(z):
     """Calculates [Fe/H] from metallicity.
@@ -103,7 +105,7 @@ def chi2_star(star, grid, use_z_surf=True):
                                           )
 
 
-def chi2_puls(star, grid, use_z_surf=True):
+def chi2_puls(star, grid):
     """Calculates chi^2 function for a star
     and a grid using availiable pulsation periods.
 
@@ -113,17 +115,13 @@ def chi2_puls(star, grid, use_z_surf=True):
         A star for which chi^2 function is calculated.
     grid : pandas.DataFrame
         Pandas DataFrame containing the grid.
-    use_z_surf : bool, optional
-        If True uses surface Z for selection of [Fe/H],
-        otherwise uses initial Z of progenitor.
-        Default: True.
 
     Returns
     -------
 
     """
 
-    pass
+    period_combinations = star.period_combinations()
 
 
 if __name__ == "__main__":
