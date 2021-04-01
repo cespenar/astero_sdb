@@ -1,5 +1,7 @@
 import numpy as np
+from pandas.core.frame import DataFrame
 
+from astero_sdb.sdb_grid_reader import SdbGrid
 from astero_sdb.star import Star
 
 
@@ -52,7 +54,7 @@ def chi2_single(x_model, x_obs, sigma):
     return ((x_obs - x_model) / sigma) ** 2.0
 
 
-def chi2_star(star, grid, use_z_surf=True):
+def chi2_star(star: Star, grid: SdbGrid, use_z_surf: bool = True):
     """Calculates chi^2 function for a given star
     and models provided in the given grid. Utilizes
     availalbe global stellar parameters.
@@ -105,7 +107,9 @@ def chi2_star(star, grid, use_z_surf=True):
                                           )
 
 
-def chi2_puls(star, grid):
+def chi2_puls(star: Star, df_selected: DataFrame, grid: SdbGrid,
+              dest_dir: str, save_period_list: bool = False,
+              period_list_name: str = None):
     """Calculates chi^2 function for a star
     and a grid using availiable pulsation periods.
 
@@ -113,8 +117,13 @@ def chi2_puls(star, grid):
     ----------
     star : Star
         A star for which chi^2 function is calculated.
-    grid : pandas.DataFrame
-        Pandas DataFrame containing the grid.
+    df_selected : pandas.DataFrame
+        Pandas DataFrame containing the models selected
+        for chi^2 calculation.
+    grid : SdbGrid
+        Complete grid of sdB models.
+    dest_dir : str
+        Target root directory for extracted models.
 
     Returns
     -------
@@ -122,6 +131,41 @@ def chi2_puls(star, grid):
     """
 
     period_combinations = star.period_combinations()
+
+    if save_period_list:
+        if period_list_name:
+            f_name = period_list_name
+        else:
+            f_name = f'{star.name}_periods.txt'
+
+        with open(f_name, 'w') as f:
+            f.write(f'{star.name}\n')
+            f.write(f'{len(period_combinations)} period combinations\n')
+            for i, p_dict in enumerate(period_combinations):
+                f.write(f'--- puls_{i+1} ---\n')
+                for id, p in p_dict.items():
+                    f.write(
+                        f"ID: {id:4}, P: {p['P']:12}, l: {int(p['l']):1}\n")
+                f.write('\n')
+
+    for i in range(len(period_combinations)):
+        df_selected[f'chi2_puls_{i+1}'] = 0.0
+
+    for model in df_selected:
+        puls_data = grid.read_puls_model(log_dir=model.log_dir,
+                                         top_dir=model.top_dir,
+                                         he4=model.custom_profile,
+                                         dest_dir=dest_dir,
+                                         delete_file=False,
+                                         keep_tree=True)
+        for i, periods in enumerate(period_combinations):
+            chi2 = 0.0
+            for p_obs in periods.values():
+                delta = np.min(np.abs(puls_data.periods(
+                    p_obs['l'], g_modes_only=True) - p_obs['P']))
+                chi2 += delta ** 2.0
+            chi2 /= len(periods)
+            model[f'chi2_puls_{i+1}'] = chi2
 
 
 if __name__ == "__main__":
