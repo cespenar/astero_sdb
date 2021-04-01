@@ -124,6 +124,14 @@ def chi2_puls(star: Star, df_selected: DataFrame, grid: SdbGrid,
         Complete grid of sdB models.
     dest_dir : str
         Target root directory for extracted models.
+    save_period_list : bool, optional
+        If True creates a file with listed all
+        combinations of periods used to calculate chi^2
+        fucntion.
+    period_list_name : str, optional
+        Name of output file saved when save_period_list
+        is True. If None default name is used.
+        Default: None.
 
     Returns
     -------
@@ -140,7 +148,7 @@ def chi2_puls(star: Star, df_selected: DataFrame, grid: SdbGrid,
 
         with open(f_name, 'w') as f:
             f.write(f'{star.name}\n')
-            f.write(f'{len(period_combinations)} period combinations\n')
+            f.write(f'{len(period_combinations)} period combinations\n\n')
             for i, p_dict in enumerate(period_combinations):
                 f.write(f'--- puls_{i+1} ---\n')
                 for id, p in p_dict.items():
@@ -151,13 +159,14 @@ def chi2_puls(star: Star, df_selected: DataFrame, grid: SdbGrid,
     for i in range(len(period_combinations)):
         df_selected[f'chi2_puls_{i+1}'] = 0.0
 
-    for model in df_selected:
+    for index, model in df_selected.iterrows():
         puls_data = grid.read_puls_model(log_dir=model.log_dir,
                                          top_dir=model.top_dir,
                                          he4=model.custom_profile,
                                          dest_dir=dest_dir,
                                          delete_file=False,
                                          keep_tree=True)
+        print(f'index: {index}')
         for i, periods in enumerate(period_combinations):
             chi2 = 0.0
             for p_obs in periods.values():
@@ -165,7 +174,7 @@ def chi2_puls(star: Star, df_selected: DataFrame, grid: SdbGrid,
                     p_obs['l'], g_modes_only=True) - p_obs['P']))
                 chi2 += delta ** 2.0
             chi2 /= len(periods)
-            model[f'chi2_puls_{i+1}'] = chi2
+            df_selected[f'chi2_puls_{i+1}'][index] = chi2
 
 
 if __name__ == "__main__":
