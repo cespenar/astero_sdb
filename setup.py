@@ -8,4 +8,4 @@ setup(name='astero_sdb',
       author_email='cespenar1@gmail.com',
       license='MIT',
       packages=['astero_sdb'],
-      install_requires=['mesa_reader', 'sqlalchemy'])
+      install_requires=['mesa_reader', 'sqlalchemy', 'tqdm'])

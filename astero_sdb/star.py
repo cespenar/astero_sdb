@@ -14,12 +14,48 @@ class Star:
 
     num_of_stars = 0
 
-    def __init__(self, name,
-                 t_eff=None, t_eff_err_p=None, t_eff_err_m=None,
-                 log_g=None, log_g_err_p=None, log_g_err_m=None,
-                 v_rot=None, v_rot_err_p=None, v_rot_err_m=None,
-                 feh=None, feh_err_p=None, feh_err_m=None,
-                 frequencies_list=None):
+    def __init__(self, name: str,
+                 t_eff: float = None, t_eff_err_p: float = None, t_eff_err_m: float = None,
+                 log_g: float = None, log_g_err_p: float = None, log_g_err_m: float = None,
+                 v_rot: float = None, v_rot_err_p: float = None, v_rot_err_m: float = None,
+                 feh: float = None, feh_err_p: float = None, feh_err_m: float = None,
+                 frequencies_list: str = None):
+        """Creates a Star object using provided observational data.
+
+        Parameters
+        ----------
+        name : str
+            Name of the star.
+        t_eff : float, optional
+            Effective temperature. Default: None.
+        t_eff_err_p : float, optional
+            Plus-error of effective temperature. Default: None.
+        t_eff_err_m : float, optional
+            Minus-error of effective temperature. Default: None.
+        log_g : float, optional
+            Surface log(g). Default: None.
+        log_g_err_p : float, optional
+            Plus-error of log(g). Default: None.
+        log_g_err_m : float, optional
+            Minus-error of log(g). Default: None.
+        v_rot : float, optional
+            Surface rotational velocity. Default: None.
+        v_rot_err_p : float, optional
+            Plus-error of v_rot. Default: None.
+        v_rot_err_m : float, optional
+            Minus-error of v_rot. Default: None.
+        feh : float, optional
+            Surface metallicity [Fe/H]. Default: None.
+        feh_err_p : float, optional
+            Plus-error of metallicity Default: None.
+        feh_err_m : float, optional
+            Minus-error of metallicity. Default: None.
+        frequencies_list : str, optional
+            Text file containing list of observed frequencies.
+            Default: None.
+        """        
+
+
         self.name = name
         self.t_eff = t_eff
         self.t_eff_err_p = t_eff_err_p
@@ -54,7 +90,7 @@ class Star:
             f"frequencies_list={self.frequencies})"
         )
 
-    def unique_multiplet_ids(self):
+    def unique_multiplet_ids(self) -> np.ndarray:
         """Returns list of multiplet indices.
 
         Returns
@@ -233,7 +269,7 @@ class Star:
             pbar.close()
 
     @staticmethod
-    def calc_feh(z):
+    def calc_feh(z: float) -> float:
         """Calculates [Fe/H] from metallicity.
         Assumes solar chemical compostion from Asplund et al. (2009).
 
@@ -260,7 +296,7 @@ class Star:
         return np.log10(z / solar_z)
 
     @staticmethod
-    def chi2_single(x_model, x_obs, sigma):
+    def chi2_single(x_model: np.array, x_obs: float, sigma: float) -> np.ndarray:
         """Calculates a single component of chi^2
         function.
 
@@ -275,7 +311,7 @@ class Star:
 
         Returns
         -------
-        float
+        numpy.ndarray
             A single component of chi^2 function.
         """
 
