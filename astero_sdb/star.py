@@ -2,6 +2,7 @@ from copy import deepcopy
 
 import numpy as np
 from pandas.core.frame import DataFrame
+from tqdm import tqdm
 
 from astero_sdb.sdb_grid_reader import SdbGrid
 
@@ -103,7 +104,7 @@ class Star:
                         periods.append(p_dict)
         return periods
 
-    def chi2_star(self, grid: SdbGrid, use_z_surf: bool = True):
+    def chi2_star(self, df_selected: DataFrame, use_z_surf: bool = True):
         """Calculates chi^2 function for the star
         and models provided in the given grid. Utilizes
         availalbe global stellar parameters.
@@ -112,7 +113,7 @@ class Star:
         ----------
         star : Star
             A star for which chi^2 function is calculated.
-        grid : pandas.DataFrame
+        df_selected : pandas.DataFrame
             Pandas DataFrame containing the grid.
         use_z_surf : bool, optional
             If True uses surface Z for selection of [Fe/H],
@@ -123,41 +124,41 @@ class Star:
         -------
 
         """
-        grid['chi2_star'] = 0.0
+        df_selected['chi2_star'] = 0.0
 
         if self.t_eff:
-            grid.chi2_star += self.chi2_single(x_model=10.0 ** grid.log_Teff,
-                                               x_obs=self.t_eff,
-                                               sigma=self.t_eff_err_p
-                                               )
+            df_selected.chi2_star += self.chi2_single(x_model=10.0 ** df_selected.log_Teff,
+                                                      x_obs=self.t_eff,
+                                                      sigma=self.t_eff_err_p
+                                                      )
 
         if self.log_g:
-            grid.chi2_star += self.chi2_single(x_model=grid.log_g,
-                                               x_obs=self.log_g,
-                                               sigma=self.log_g_err_p
-                                               )
+            df_selected.chi2_star += self.chi2_single(x_model=df_selected.log_g,
+                                                      x_obs=self.log_g,
+                                                      sigma=self.log_g_err_p
+                                                      )
 
         if self.v_rot:
-            grid.chi2_star += self.chi2_single(x_model=grid.rot,
-                                               x_obs=self.v_rot,
-                                               sigma=self.v_rot_err_p
-                                               )
+            df_selected.chi2_star += self.chi2_single(x_model=df_selected.rot,
+                                                      x_obs=self.v_rot,
+                                                      sigma=self.v_rot_err_p
+                                                      )
 
         if self.feh:
             if use_z_surf:
-                grid.chi2_star += self.chi2_single(x_model=self(grid.z_surf),
-                                                   x_obs=self.feh,
-                                                   sigma=self.feh_err_p
-                                                   )
+                df_selected.chi2_star += self.chi2_single(x_model=self(df_selected.z_surf),
+                                                          x_obs=self.feh,
+                                                          sigma=self.feh_err_p
+                                                          )
             else:
-                grid.chi2_star += self.chi2_single(x_model=self.calc_feh(grid.z_i),
-                                                   x_obs=self.feh,
-                                                   sigma=self.feh_err_p
-                                                   )
+                df_selected.chi2_star += self.chi2_single(x_model=self.calc_feh(df_selected.z_i),
+                                                          x_obs=self.feh,
+                                                          sigma=self.feh_err_p
+                                                          )
 
     def chi2_puls(self, df_selected: DataFrame, grid: SdbGrid,
                   dest_dir: str, save_period_list: bool = False,
-                  period_list_name: str = None):
+                  period_list_name: str = None, progress: bool = True):
         """Calculates chi^2 function for the star
         and a grid using availiable pulsation periods.
 
@@ -178,6 +179,8 @@ class Star:
             Name of output file saved when save_period_list
             is True. If None default name is used.
             Default: None.
+        progress: bool, optional
+            If true shows a progress bar. Default: True.
 
         Returns
         -------
@@ -205,6 +208,8 @@ class Star:
         for i in range(len(period_combinations)):
             df_selected[f'chi2_puls_{i+1}'] = 0.0
 
+        if progress:
+            pbar = tqdm(total=len(df_selected))
         for index, model in df_selected.iterrows():
             puls_data = grid.read_puls_model(log_dir=model.log_dir,
                                              top_dir=model.top_dir,
@@ -212,7 +217,7 @@ class Star:
                                              dest_dir=dest_dir,
                                              delete_file=False,
                                              keep_tree=True)
-            print(f'index: {index}')
+            # print(f'index: {index}')
             for i, periods in enumerate(period_combinations):
                 chi2 = 0.0
                 for p_obs in periods.values():
@@ -221,6 +226,11 @@ class Star:
                     chi2 += delta ** 2.0
                 chi2 /= len(periods)
                 df_selected[f'chi2_puls_{i+1}'][index] = chi2
+            if progress:
+                pbar.set_description('Calculating chi^2 puls')
+                pbar.update(1)
+        if progress:
+            pbar.close()
 
     @staticmethod
     def calc_feh(z):
