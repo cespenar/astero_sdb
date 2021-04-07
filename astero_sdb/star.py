@@ -1,4 +1,5 @@
 from copy import deepcopy
+from re import U
 
 import numpy as np
 from pandas.core.frame import DataFrame
@@ -53,8 +54,7 @@ class Star:
         frequencies_list : str, optional
             Text file containing list of observed frequencies.
             Default: None.
-        """        
-
+        """
 
         self.name = name
         self.t_eff = t_eff
@@ -267,6 +267,130 @@ class Star:
                 pbar.update(1)
         if progress:
             pbar.close()
+
+    def evaluate_chi2(self, df_selected: DataFrame, grid: SdbGrid,
+                      dest_dir: str, save_period_list: bool = False,
+                      period_list_name: str = None, progress: bool = True,
+                      use_z_surf: bool = True, save_results: bool = True,
+                      results_file_name: str = None):
+        """Evaluates chi^2 functions for the star.
+
+        Parameters
+        ----------
+        df_selected : pandas.DataFrame
+            Pandas DataFrame containing the models selected
+            for chi^2 calculation.
+        grid : SdbGrid
+            Complete grid of sdB models.
+        dest_dir : str
+            Target root directory for extracted models.
+        save_period_list : bool, optional
+            If True creates a file with listed all
+            combinations of periods used to calculate chi^2
+            fucntion.
+        period_list_name : str, optional
+            Name of output file saved when save_period_list
+            is True. If None default name is used.
+            Default: None.
+        progress: bool, optional
+            If true shows a progress bar. Default: True.
+        use_z_surf : bool, optional
+            If True uses surface Z for selection of [Fe/H],
+            otherwise uses initial Z of progenitor.
+            Default: True.
+        save_results : bool, optional
+            If True saves the DataFrame containing calculated
+            values of chi^2 to a text file.
+            Default: True.
+        output_file : str, optional
+            Name of the output file containing values of chi^2.
+            If not provided default name is used.
+            Default: None.
+
+        Returns
+        -------
+
+        """
+
+        self.chi2_star(df_selected=df_selected, use_z_surf=use_z_surf)
+        self.chi2_puls(df_selected=df_selected, grid=grid, dest_dir=dest_dir,
+                       save_period_list=save_period_list,
+                       period_list_name=period_list_name,
+                       progress=progress)
+        if save_results:
+            if results_file_name:
+                f_name = results_file_name
+            else:
+                f_name = f'{self.name}_chi2.txt'
+            df_selected.to_csv(f_name, sep=' ', header=True, index=False)
+
+    def df_from_errorbox(self, grid: SdbGrid, sigma: float = 1.0,
+                         use_teff: bool = True, use_logg: bool = True,
+                         use_vrot: bool = False, use_feh: bool = False,
+                         use_z_surf: bool = False) -> DataFrame:
+        """Selects models from a grid based on the observational
+        parameters of the star.
+
+        Parameters
+        ----------
+        grid : SdbGrid
+            A grid of sdB stars.
+        sigma : float, optional
+            Size of the considered error box expressed
+            as a multiplier of error.
+            Default: 1.0.
+        use_teff : bool, optional
+            If True uses effective temperature for selection.
+            Default: True.
+        use_logg : bool, optional
+            If True uses log_g for selection.
+            Default: True.
+        use_vrot : bool, optional
+            If True uses rotational velocity for selection.
+            Default: False.
+        use_feh : bool, optional
+            If True uses metallicity for selection.
+            Default: False.
+        use_z_surf : bool, optional
+            If True uses surface Z for selection of [Fe/H], otherwise
+            uses initial Z of progenitor.
+            Default: False.
+
+        Returns
+        ----------
+        DaraFrame
+            Dataframe containing the selected models.
+        """
+
+        c = True
+
+        if use_teff:
+            c_teff = (10.0 ** grid.data.log_Teff <= self.t_eff + sigma*self.t_eff_err_p) & \
+                (10.0 ** grid.data.log_Teff >= self.t_eff - sigma*self.t_eff_err_m)
+            c &= c_teff
+
+        if use_logg:
+            c_logg = (grid.data.log_g <= self.log_g + sigma*self.log_g_err_p) & \
+                (grid.data.log_g >= self.log_g - sigma*self.log_g_err_m)
+            c &= c_logg
+
+        if use_vrot:
+            c_vrot = (grid.data.rot <= self.v_rot + sigma*self.v_rot_err_p) & \
+                (grid.data.rot >= self.v_rot - sigma*self.v_rot_err_m)
+            c &= c_vrot
+
+        if use_feh:
+            if use_z_surf:
+                c_feh = (grid.calc_feh(grid.data.z_surf) <= self.feh + sigma*self.feh_err_p) & \
+                    (self.calc_feh(grid.data.z_surf) >=
+                     self.feh - sigma*self.feh_err_m)
+            else:
+                c_feh = (grid.calc_feh(self.data.z_i) <= self.feh + sigma*self.feh_err_p) & \
+                    (self.calc_feh(self.data.z_i) >=
+                     self.feh - sigma*self.feh_err_m)
+            c &= c_feh
+
+        return grid.data[c]
 
     @staticmethod
     def calc_feh(z: float) -> float:
