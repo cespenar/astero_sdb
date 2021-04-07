@@ -252,7 +252,6 @@ class Star:
                                              dest_dir=dest_dir,
                                              delete_file=False,
                                              keep_tree=True)
-            # print(f'index: {index}')
             for i, periods in enumerate(period_combinations):
                 chi2 = 0.0
                 for p_obs in periods.values():
