@@ -101,7 +101,7 @@ class Star:
 
     def period_combinations(self):
         """Finds all possible combinations of periods
-        for identified triplets and doubles.
+        for identified triplets and doublets.
 
         Returns
         -------
@@ -118,7 +118,7 @@ class Star:
             if len(df_multi) == 3:
                 for p_dict in periods:
                     p_dict[df_multi['id'][1]] = {'P': df_multi['P'][1], 'l': l}
-            else:
+            if len(df_multi) == 2:
                 if (df_multi['m'][0] == -1) and (df_multi['m'][1] == 1):
                     for p_dict in periods:
                         id_middle = round(
@@ -137,6 +137,9 @@ class Star:
                         periods_temp.append(p_dict_temp)
                     for p_dict in periods_temp:
                         periods.append(p_dict)
+            if len(df_multi) == 1:
+                for p_dict in periods:
+                    p_dict[df_multi['id'][0]] = {'P': df_multi['P'][0], 'l': l}
         return periods
 
     def chi2_star(self, df_selected: DataFrame, use_z_surf: bool = True):
@@ -267,7 +270,9 @@ class Star:
             pbar.close()
 
     def evaluate_chi2(self, df_selected: DataFrame, grid: SdbGrid,
-                      dest_dir: str, save_period_list: bool = False,
+                      dest_dir: str, use_spectroscopy: bool = True,
+                      use_periods: bool = True,
+                      save_period_list: bool = False,
                       period_list_name: str = None, progress: bool = True,
                       use_z_surf: bool = True, save_results: bool = True,
                       results_file_name: str = None):
@@ -282,6 +287,12 @@ class Star:
             Complete grid of sdB models.
         dest_dir : str
             Target root directory for extracted models.
+        use_spectroscopy : bool, optional
+            If True calculates chi^2 using available spectroscopic
+            parameters. Default: True.
+        use_periods : bool, optional
+            If True calculates chi^2 using availiable pulsational
+            periods. Default: True. 
         save_period_list : bool, optional
             If True creates a file with listed all
             combinations of periods used to calculate chi^2
@@ -310,11 +321,13 @@ class Star:
 
         """
 
-        self.chi2_star(df_selected=df_selected, use_z_surf=use_z_surf)
-        self.chi2_puls(df_selected=df_selected, grid=grid, dest_dir=dest_dir,
-                       save_period_list=save_period_list,
-                       period_list_name=period_list_name,
-                       progress=progress)
+        if use_spectroscopy:
+            self.chi2_star(df_selected=df_selected, use_z_surf=use_z_surf)
+        if use_periods:
+            self.chi2_puls(df_selected=df_selected, grid=grid, dest_dir=dest_dir,
+                           save_period_list=save_period_list,
+                           period_list_name=period_list_name,
+                           progress=progress)
         if save_results:
             if results_file_name:
                 f_name = results_file_name
