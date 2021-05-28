@@ -66,10 +66,10 @@ class SdbGrid():
     def __repr__(self):
         return f"SdbGrid(db_file={self.db_file}, grid_dir={self.grid_dir})"
 
-    def read_history(self, log_dir: str, top_dir: str, he4: float,
+    def read_history(self, log_dir: str, top_dir: str,
                      dest_dir: str = '.', delete_file: bool = True,
                      rename: bool = False, keep_tree: bool = False) -> mesa.MesaData:
-        """Reads a single evolutionary model (a profile) and returns
+        """Reads a a MESA history file and returns
         a MesaData object.
 
         Parameters
@@ -78,12 +78,10 @@ class SdbGrid():
             Log directory.
         top_dir : str
             Top directory.
-        he4 : float
-            Central helium abundance of the required model.
         dest_dir : str, optional
-            Temporary dirctory for the required model. Default: '.'.
+            Temporary dirctory for the required track. Default: '.'.
         delete_file : bool, optional
-            If True delete the extracted model. The model is not deleted
+            If True delete the extracted track. The track is not deleted
             if 'keep_tree' is True. Default: True.
         rename : bool, optional
             If True it renames the history file to include information about
@@ -96,13 +94,13 @@ class SdbGrid():
         Returns
         ----------
         MesaData
-            Evolutionary model (MESA profile file) as MesaData object.
+            Evolutionary track (MESA history file) as MesaData object.
         """
 
         history_name = f'history{log_dir[4:]}.data' if rename else 'history.data'
         if keep_tree:
             file_name = os.path.join(
-                dest_dir, top_dir, log_dir, self.evol_model_name(he4))
+                dest_dir, top_dir, log_dir, history_name)
         else:
             file_name = os.path.join(dest_dir, history_name)
         if not self.model_extracted(file_name):
