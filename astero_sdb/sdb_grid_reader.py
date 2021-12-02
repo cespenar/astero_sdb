@@ -153,7 +153,7 @@ class SdbGrid():
         return data
 
     def read_puls_model(self, log_dir: str, top_dir: str, he4: float,
-                        dest_dir: str = '.', delete_file: str = True,
+                        dest_dir: str = '.', delete_file: bool = True,
                         keep_tree=False) -> GyreData:
         """Reads a calculated GYRE model and returns
         a GyreData object.
