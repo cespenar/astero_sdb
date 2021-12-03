@@ -106,6 +106,8 @@ class Star:
             f"log_g={self.log_g}, log_g_err_p={self.log_g_err_p}, log_g_err_m={self.log_g_err_m}, "
             f"v_rot={self.v_rot}, v_rot_err_p={self.v_rot_err_p}, v_rot_err_m={self.v_rot_err_m}, "
             f"feh={self.feh}, feh_err_p={self.feh_err_p}, feh_err_m={self.feh_err_m}, "
+            f"log_l={self.log_l}, log_l_err_p={self.log_l_err_p}, log_l_err_m={self.log_l_err_m}, "
+            f"rad={self.rad}, rad_err_p={self.rad_err_p}, rad_err_m={self.rad_err_m}, "
             f"frequencies_list={self.frequencies})"
         )
 
