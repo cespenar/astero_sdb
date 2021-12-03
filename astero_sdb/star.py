@@ -82,10 +82,10 @@ class Star:
         self.feh = feh
         self.feh_err_p = feh_err_p
         self.feh_err_m = feh_err_m
-        self.log_l - log_l
+        self.log_l = log_l
         self.log_l_err_p = log_l_err_p
         self.log_l_err_m = log_l_err_m
-        self.rad = feh
+        self.rad = rad
         self.rad_err_p = rad_err_p
         self.rad_err_m = rad_err_m
         if frequencies_list:
