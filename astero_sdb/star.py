@@ -19,7 +19,7 @@ class Star:
                  log_g: float = None, log_g_err_p: float = None, log_g_err_m: float = None,
                  v_rot: float = None, v_rot_err_p: float = None, v_rot_err_m: float = None,
                  feh: float = None, feh_err_p: float = None, feh_err_m: float = None,
-                 log_l: float = None, log_l_err_p: float = None, log_l_err_m: float = None,
+                 luminosity: float = None, luminosity_err_p: float = None, luminosity_err_m: float = None,
                  rad: float = None, rad_err_p: float = None, rad_err_m: float = None,
                  frequencies_list: str = None):
         """Creates a Star object using provided observational data.
@@ -52,12 +52,12 @@ class Star:
             Plus-error of metallicity. Default: None.
         feh_err_m : float, optional
             Minus-error of metallicity. Default: None.
-        log_l : float, optional
-            Luminosity, logL. Default: None.
-        log_l_err_p : float, optional
-            Plus-error of logL. Default: None.
-        log_l_err_m : float, optional
-            Minus-error of logL. Default: None.
+        luminosity : float, optional
+            Luminosity. Default: None.
+        luminosity_err_p : float, optional
+            Plus-error of L. Default: None.
+        luminosity_err_m : float, optional
+            Minus-error of L. Default: None.
         rad : float, optional
             Radius in solar units. Default: None.
         rad_err_p : float, optional
@@ -82,9 +82,9 @@ class Star:
         self.feh = feh
         self.feh_err_p = feh_err_p
         self.feh_err_m = feh_err_m
-        self.log_l = log_l
-        self.log_l_err_p = log_l_err_p
-        self.log_l_err_m = log_l_err_m
+        self.luminosity = luminosity
+        self.luminosity_err_p = luminosity_err_p
+        self.luminosity_err_m = luminosity_err_m
         self.rad = rad
         self.rad_err_p = rad_err_p
         self.rad_err_m = rad_err_m
@@ -106,7 +106,7 @@ class Star:
             f"log_g={self.log_g}, log_g_err_p={self.log_g_err_p}, log_g_err_m={self.log_g_err_m}, "
             f"v_rot={self.v_rot}, v_rot_err_p={self.v_rot_err_p}, v_rot_err_m={self.v_rot_err_m}, "
             f"feh={self.feh}, feh_err_p={self.feh_err_p}, feh_err_m={self.feh_err_m}, "
-            f"log_l={self.log_l}, log_l_err_p={self.log_l_err_p}, log_l_err_m={self.log_l_err_m}, "
+            f"luminosity={self.luminosity}, luminosity_err_p={self.luminosity_err_p}, luminosity_err_m={self.luminosity_err_m}, "
             f"rad={self.rad}, rad_err_p={self.rad_err_p}, rad_err_m={self.rad_err_m}, "
             f"frequencies_list={self.frequencies})"
         )
