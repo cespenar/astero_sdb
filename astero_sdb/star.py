@@ -1,10 +1,9 @@
 from copy import deepcopy
 
 import numpy as np
+from astero_sdb.sdb_grid_reader import SdbGrid
 from pandas.core.frame import DataFrame
 from tqdm import tqdm
-
-from astero_sdb.sdb_grid_reader import SdbGrid
 
 
 class Star:
@@ -14,13 +13,26 @@ class Star:
 
     num_of_stars = 0
 
-    def __init__(self, name: str,
-                 t_eff: float = None, t_eff_err_p: float = None, t_eff_err_m: float = None,
-                 log_g: float = None, log_g_err_p: float = None, log_g_err_m: float = None,
-                 v_rot: float = None, v_rot_err_p: float = None, v_rot_err_m: float = None,
-                 feh: float = None, feh_err_p: float = None, feh_err_m: float = None,
-                 luminosity: float = None, luminosity_err_p: float = None, luminosity_err_m: float = None,
-                 rad: float = None, rad_err_p: float = None, rad_err_m: float = None,
+    def __init__(self,
+                 name: str,
+                 t_eff: float = None,
+                 t_eff_err_p: float = None,
+                 t_eff_err_m: float = None,
+                 log_g: float = None,
+                 log_g_err_p: float = None,
+                 log_g_err_m: float = None,
+                 v_rot: float = None,
+                 v_rot_err_p: float = None,
+                 v_rot_err_m: float = None,
+                 feh: float = None,
+                 feh_err_p: float = None,
+                 feh_err_m: float = None,
+                 luminosity: float = None,
+                 luminosity_err_p: float = None,
+                 luminosity_err_m: float = None,
+                 rad: float = None,
+                 rad_err_p: float = None,
+                 rad_err_m: float = None,
                  frequencies_list: str = None):
         """Creates a Star object using provided observational data.
 
@@ -97,18 +109,25 @@ class Star:
         Star.num_of_stars += 1
 
     def __str__(self):
-        return f"{self.name}"
+        return f'{self.name}'
 
     def __repr__(self):
         return (
-            f"Star({self.name}, "
-            f"t_eff={self.t_eff}, t_eff_err_p={self.t_eff_err_p}, t_eff_err_m={self.t_eff_err_m}, "
-            f"log_g={self.log_g}, log_g_err_p={self.log_g_err_p}, log_g_err_m={self.log_g_err_m}, "
-            f"v_rot={self.v_rot}, v_rot_err_p={self.v_rot_err_p}, v_rot_err_m={self.v_rot_err_m}, "
-            f"feh={self.feh}, feh_err_p={self.feh_err_p}, feh_err_m={self.feh_err_m}, "
-            f"luminosity={self.luminosity}, luminosity_err_p={self.luminosity_err_p}, luminosity_err_m={self.luminosity_err_m}, "
-            f"rad={self.rad}, rad_err_p={self.rad_err_p}, rad_err_m={self.rad_err_m}, "
-            f"frequencies_list={self.frequencies})"
+            f'Star({self.name}, '
+            f't_eff={self.t_eff}, t_eff_err_p={self.t_eff_err_p}, '
+            f't_eff_err_m={self.t_eff_err_m}, '
+            f'log_g={self.log_g}, log_g_err_p={self.log_g_err_p}, '
+            f'log_g_err_m={self.log_g_err_m}, '
+            f'v_rot={self.v_rot}, v_rot_err_p={self.v_rot_err_p}, '
+            f'v_rot_err_m={self.v_rot_err_m}, '
+            f'feh={self.feh}, feh_err_p={self.feh_err_p}, '
+            f'feh_err_m={self.feh_err_m}, '
+            f'luminosity={self.luminosity}, '
+            f'luminosity_err_p={self.luminosity_err_p}, '
+            f'luminosity_err_m={self.luminosity_err_m}, '
+            f'rad={self.rad}, rad_err_p={self.rad_err_p}, '
+            f'rad_err_m={self.rad_err_m}, '
+            f'frequencies_list={self.frequencies})'
         )
 
     def unique_multiplet_ids(self) -> np.ndarray:
@@ -119,7 +138,8 @@ class Star:
         numpy.array
             Numpy array with unique multiplet indices.
         """
-        return np.unique(self.frequencies['idm'][~np.isnan(self.frequencies['idm'])])
+        return np.unique(
+            self.frequencies['idm'][~np.isnan(self.frequencies['idm'])])
 
     def period_combinations(self):
         """Finds all possible combinations of periods
@@ -144,9 +164,9 @@ class Star:
                 if (df_multi['m'][0] == -1) and (df_multi['m'][1] == 1):
                     for p_dict in periods:
                         id_middle = round(
-                            (df_multi['id'][0] + df_multi['id'][1])/2.0, 1)
+                            (df_multi['id'][0] + df_multi['id'][1]) / 2.0, 1)
                         p_middle = round(
-                            (df_multi['P'][0] + df_multi['P'][1])/2.0, 5)
+                            (df_multi['P'][0] + df_multi['P'][1]) / 2.0, 5)
                         p_dict[id_middle] = {'P': p_middle, 'l': l}
                 else:
                     periods_temp = []
@@ -164,7 +184,8 @@ class Star:
                     p_dict[df_multi['id'][0]] = {'P': df_multi['P'][0], 'l': l}
         return periods
 
-    def chi2_star(self, df_selected: DataFrame, use_z_surf: bool = True):
+    def chi2_star(self, df_selected: DataFrame,
+                  use_z_surf: bool = True) -> None:
         """Calculates chi^2 function for the star
         and models provided in the given grid. Utilizes
         availalbe global stellar parameters.
@@ -187,16 +208,18 @@ class Star:
         df_selected['chi2_star'] = 0.0
 
         if self.t_eff:
-            df_selected.chi2_star += self.chi2_single(x_model=10.0 ** df_selected.log_Teff,
-                                                      x_obs=self.t_eff,
-                                                      sigma=self.t_eff_err_p
-                                                      )
+            df_selected.chi2_star += self.chi2_single(
+                x_model=10.0 ** df_selected.log_Teff,
+                x_obs=self.t_eff,
+                sigma=self.t_eff_err_p
+            )
 
         if self.log_g:
-            df_selected.chi2_star += self.chi2_single(x_model=df_selected.log_g,
-                                                      x_obs=self.log_g,
-                                                      sigma=self.log_g_err_p
-                                                      )
+            df_selected.chi2_star += self.chi2_single(
+                x_model=df_selected.log_g,
+                x_obs=self.log_g,
+                sigma=self.log_g_err_p
+            )
 
         if self.v_rot:
             df_selected.chi2_star += self.chi2_single(x_model=df_selected.rot,
@@ -206,19 +229,25 @@ class Star:
 
         if self.feh:
             if use_z_surf:
-                df_selected.chi2_star += self.chi2_single(x_model=self(df_selected.z_surf),
-                                                          x_obs=self.feh,
-                                                          sigma=self.feh_err_p
-                                                          )
+                df_selected.chi2_star += self.chi2_single(
+                    x_model=df_selected.z_surf,
+                    x_obs=self.feh,
+                    sigma=self.feh_err_p
+                )
             else:
-                df_selected.chi2_star += self.chi2_single(x_model=self.calc_feh(df_selected.z_i),
-                                                          x_obs=self.feh,
-                                                          sigma=self.feh_err_p
-                                                          )
+                df_selected.chi2_star += self.chi2_single(
+                    x_model=self.calc_feh(df_selected.z_i),
+                    x_obs=self.feh,
+                    sigma=self.feh_err_p
+                )
 
-    def chi2_puls(self, df_selected: DataFrame, grid: SdbGrid,
-                  dest_dir: str, save_period_list: bool = False,
-                  period_list_name: str = None, progress: bool = True):
+    def chi2_puls(self,
+                  df_selected: DataFrame,
+                  grid: SdbGrid,
+                  dest_dir: str,
+                  save_period_list: bool = False,
+                  period_list_name: str = None,
+                  progress: bool = True) -> None:
         """Calculates chi^2 function for the star
         and a grid using availiable pulsation periods.
 
@@ -259,14 +288,14 @@ class Star:
                 f.write(f'{self.name}\n')
                 f.write(f'{len(period_combinations)} period combinations\n\n')
                 for i, p_dict in enumerate(period_combinations):
-                    f.write(f'--- puls_{i+1} ---\n')
+                    f.write(f'--- puls_{i + 1} ---\n')
                     for id, p in p_dict.items():
                         f.write(
-                            f"ID: {id:4}, P: {p['P']:12}, l: {int(p['l']):1}\n")
+                            f'ID: {id:4}, P: {p["P"]:12}, l: {int(p["l"]):1}\n')
                     f.write('\n')
 
         for i in range(len(period_combinations)):
-            df_selected[f'chi2_puls_{i+1}'] = 0.0
+            df_selected[f'chi2_puls_{i + 1}'] = 0.0
 
         if progress:
             pbar = tqdm(total=len(df_selected))
@@ -284,20 +313,25 @@ class Star:
                         p_obs['l'], g_modes_only=True) - p_obs['P']))
                     chi2 += delta ** 2.0
                 chi2 /= len(periods)
-                df_selected[f'chi2_puls_{i+1}'][index] = chi2
+                df_selected[f'chi2_puls_{i + 1}'][index] = chi2
             if progress:
                 pbar.set_description('Calculating chi^2 puls')
                 pbar.update(1)
         if progress:
             pbar.close()
 
-    def evaluate_chi2(self, df_selected: DataFrame, grid: SdbGrid,
-                      dest_dir: str, use_spectroscopy: bool = True,
+    def evaluate_chi2(self,
+                      df_selected: DataFrame,
+                      grid: SdbGrid,
+                      dest_dir: str,
+                      use_spectroscopy: bool = True,
                       use_periods: bool = True,
                       save_period_list: bool = False,
-                      period_list_name: str = None, progress: bool = True,
-                      use_z_surf: bool = True, save_results: bool = True,
-                      results_file_name: str = None):
+                      period_list_name: str = None,
+                      progress: bool = True,
+                      use_z_surf: bool = True,
+                      save_results: bool = True,
+                      results_file_name: str = None) -> None:
         """Evaluates chi^2 functions for the star.
 
         Parameters
@@ -333,7 +367,7 @@ class Star:
             If True saves the DataFrame containing calculated
             values of chi^2 to a text file.
             Default: True.
-        output_file : str, optional
+        results_file_name : str, optional
             Name of the output file containing values of chi^2.
             If not provided default name is used.
             Default: None.
@@ -346,7 +380,8 @@ class Star:
         if use_spectroscopy:
             self.chi2_star(df_selected=df_selected, use_z_surf=use_z_surf)
         if use_periods:
-            self.chi2_puls(df_selected=df_selected, grid=grid, dest_dir=dest_dir,
+            self.chi2_puls(df_selected=df_selected, grid=grid,
+                           dest_dir=dest_dir,
                            save_period_list=save_period_list,
                            period_list_name=period_list_name,
                            progress=progress)
@@ -357,9 +392,13 @@ class Star:
                 f_name = f'{self.name}_chi2.txt'
             df_selected.to_csv(f_name, sep=' ', header=True, index=False)
 
-    def df_from_errorbox(self, grid: SdbGrid, sigma: float = 1.0,
-                         use_teff: bool = True, use_logg: bool = True,
-                         use_vrot: bool = False, use_feh: bool = False,
+    def df_from_errorbox(self,
+                         grid: SdbGrid,
+                         sigma: float = 1.0,
+                         use_teff: bool = True,
+                         use_logg: bool = True,
+                         use_vrot: bool = False,
+                         use_feh: bool = False,
                          use_z_surf: bool = False) -> DataFrame:
         """Selects models from a grid based on the observational
         parameters of the star.
@@ -398,29 +437,34 @@ class Star:
         c = True
 
         if use_teff:
-            c_teff = (10.0 ** grid.data.log_Teff <= self.t_eff + sigma*self.t_eff_err_p) & \
-                (10.0 ** grid.data.log_Teff >= self.t_eff - sigma*self.t_eff_err_m)
+            c_teff = (10.0 ** grid.data.log_Teff <= self.t_eff
+                      + sigma * self.t_eff_err_p) & \
+                     (10.0 ** grid.data.log_Teff >= self.t_eff
+                      - sigma * self.t_eff_err_m)
             c &= c_teff
 
         if use_logg:
-            c_logg = (grid.data.log_g <= self.log_g + sigma*self.log_g_err_p) & \
-                (grid.data.log_g >= self.log_g - sigma*self.log_g_err_m)
+            c_logg = (grid.data.log_g <= self.log_g
+                      + sigma * self.log_g_err_p) & \
+                     (grid.data.log_g >= self.log_g - sigma * self.log_g_err_m)
             c &= c_logg
 
         if use_vrot:
-            c_vrot = (grid.data.rot <= self.v_rot + sigma*self.v_rot_err_p) & \
-                (grid.data.rot >= self.v_rot - sigma*self.v_rot_err_m)
+            c_vrot = (grid.data.rot <= self.v_rot + sigma * self.v_rot_err_p) & \
+                     (grid.data.rot >= self.v_rot - sigma * self.v_rot_err_m)
             c &= c_vrot
 
         if use_feh:
             if use_z_surf:
-                c_feh = (grid.calc_feh(grid.data.z_surf) <= self.feh + sigma*self.feh_err_p) & \
-                    (self.calc_feh(grid.data.z_surf) >=
-                     self.feh - sigma*self.feh_err_m)
+                c_feh = (self.calc_feh(
+                    grid.data.z_surf) <= self.feh + sigma * self.feh_err_p) & \
+                        (self.calc_feh(grid.data.z_surf) >=
+                         self.feh - sigma * self.feh_err_m)
             else:
-                c_feh = (grid.calc_feh(self.data.z_i) <= self.feh + sigma*self.feh_err_p) & \
-                    (self.calc_feh(self.data.z_i) >=
-                     self.feh - sigma*self.feh_err_m)
+                c_feh = (self.calc_feh(
+                    grid.data.z_i) <= self.feh + sigma * self.feh_err_p) & \
+                        (self.calc_feh(grid.data.z_i) >=
+                         self.feh - sigma * self.feh_err_m)
             c &= c_feh
 
         return grid.data[c]
@@ -453,7 +497,9 @@ class Star:
         return np.log10(z / solar_z)
 
     @staticmethod
-    def chi2_single(x_model: np.array, x_obs: float, sigma: float) -> np.ndarray:
+    def chi2_single(x_model: np.array,
+                    x_obs: float,
+                    sigma: float) -> np.ndarray:
         """Calculates a single component of chi^2
         function.
 

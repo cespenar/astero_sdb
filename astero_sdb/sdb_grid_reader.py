@@ -3,15 +3,13 @@ import shutil
 from zipfile import ZipFile
 
 import mesa_reader as mesa
-import numpy as np
 import pandas as pd
-from pandas.core.frame import DataFrame
 from sqlalchemy import create_engine
 
 from .gyre_reader import GyreData
 
 
-class SdbGrid():
+class SdbGrid:
     """Structure containing a processed MESA grid of sdB stars.
 
     Reads a grid and provides methods to extract and read models.
@@ -61,14 +59,16 @@ class SdbGrid():
         self.data = pd.read_sql('models', engine)
 
     def __str__(self):
-        return f"SdbGrid based on '{self.db_file}' database and with models located at '{self.grid_dir}'"
+        return (f'SdbGrid based on \'{self.db_file}\' '
+                f'database and with models located at \'{self.grid_dir}\'')
 
     def __repr__(self):
-        return f"SdbGrid(db_file={self.db_file}, grid_dir={self.grid_dir})"
+        return f'SdbGrid(db_file={self.db_file}, grid_dir={self.grid_dir})'
 
     def read_history(self, log_dir: str, top_dir: str,
                      dest_dir: str = '.', delete_file: bool = True,
-                     rename: bool = False, keep_tree: bool = False) -> mesa.MesaData:
+                     rename: bool = False,
+                     keep_tree: bool = False) -> mesa.MesaData:
         """Reads a a MESA history file and returns
         a MesaData object.
 
@@ -97,7 +97,10 @@ class SdbGrid():
             Evolutionary track (MESA history file) as MesaData object.
         """
 
-        history_name = f'history{log_dir[4:]}.data' if rename else 'history.data'
+        if rename:
+            history_name = f'history{log_dir[4:]}.data'
+        else:
+            history_name = 'history.data'
         if keep_tree:
             file_name = os.path.join(
                 dest_dir, top_dir, log_dir, history_name)
@@ -141,8 +144,8 @@ class SdbGrid():
         """
 
         if keep_tree:
-            file_name = os.path.join(
-                dest_dir, top_dir, log_dir, self.evol_model_name(he4))
+            file_name = os.path.join(dest_dir, top_dir, log_dir,
+                                     self.evol_model_name(he4))
         else:
             file_name = os.path.join(dest_dir, self.evol_model_name(he4))
         if not self.model_extracted(file_name):
@@ -183,8 +186,8 @@ class SdbGrid():
         """
 
         if keep_tree:
-            file_name = os.path.join(
-                dest_dir, top_dir, log_dir, self.puls_model_name(he4))
+            file_name = os.path.join(dest_dir, top_dir, log_dir,
+                                     self.puls_model_name(he4))
         else:
             file_name = os.path.join(dest_dir, self.puls_model_name(he4))
         if not self.model_extracted(file_name):
@@ -196,7 +199,7 @@ class SdbGrid():
 
     def extract_history(self, log_dir: str, top_dir: str,
                         dest_dir: str, rename: bool = False,
-                        keep_tree: bool = False):
+                        keep_tree: bool = False) -> None:
         """Extracts a MESA history file.
 
         Parameters
@@ -206,8 +209,8 @@ class SdbGrid():
         top_dir : str
             Top directory.
         dest_dir : str
-            Destination directory for the extracted model if 'keep_tree' is False,
-            or the root direcotry if 'keep_tree' is True.
+            Destination directory for the extracted model if 'keep_tree'
+            is False, or the root direcotry if 'keep_tree' is True.
         rename : bool
             If True it renames the history file to include information about
             the model contained in log_dir. Default: False.
@@ -221,7 +224,10 @@ class SdbGrid():
         """
 
         grid_zip_file = os.path.join(self.grid_dir, self.archive_name(top_dir))
-        history_name = f'history{log_dir[4:]}.data' if rename else 'history.data'
+        if rename:
+            history_name = f'history{log_dir[4:]}.data'
+        else:
+            history_name = 'history.data'
         grid_zip_path = os.path.join(top_dir, log_dir, history_name)
         dest_path = os.path.join(dest_dir, history_name)
 
@@ -229,11 +235,12 @@ class SdbGrid():
             if keep_tree:
                 archive.extract(grid_zip_path, dest_dir)
             else:
-                with archive.open(grid_zip_path) as zipped_file, open(dest_path, 'wb') as dest_file:
+                with archive.open(grid_zip_path) as zipped_file, open(
+                        dest_path, 'wb') as dest_file:
                     shutil.copyfileobj(zipped_file, dest_file)
 
     def extract_evol_model(self, log_dir: str, top_dir: str, he4: float,
-                           dest_dir: str, keep_tree: bool = False):
+                           dest_dir: str, keep_tree: bool = False) -> None:
         """Extracts a single evolutionary model (a profile).
 
         Parameters
@@ -245,8 +252,8 @@ class SdbGrid():
         he4 : float
             Central helium abundance of the required model.
         dest_dir : str
-            Destination directory for the extracted model if 'keep_tree' is False,
-            or the root direcotry if 'keep_tree' is True.
+            Destination directory for the extracted model if 'keep_tree'
+            is False, or the root direcotry if 'keep_tree' is True.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
             ZipFile.extract behaviour), otherwise extract file directly to
@@ -266,11 +273,12 @@ class SdbGrid():
                 if keep_tree:
                     archive.extract(grid_zip_path, dest_dir)
                 else:
-                    with archive.open(grid_zip_path) as zipped_file, open(dest_path, 'wb') as dest_file:
+                    with archive.open(grid_zip_path) as zipped_file, open(
+                            dest_path, 'wb') as dest_file:
                         shutil.copyfileobj(zipped_file, dest_file)
 
     def extract_puls_model(self, log_dir: str, top_dir: str, he4: float,
-                           dest_dir: str, keep_tree: bool = False):
+                           dest_dir: str, keep_tree: bool = False) -> None:
         """Extracts a single calculated GYRE model.
 
         Parameters
@@ -282,8 +290,8 @@ class SdbGrid():
         he4 : float
             Central helium abundance of the required model.
         dest_dir : str
-            Destination directory for the extracted model if 'keep_tree' is False,
-            or the root direcotry if 'keep_tree' is True.
+            Destination directory for the extracted model if 'keep_tree'
+            is False, or the root direcotry if 'keep_tree' is True.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
             ZipFile.extract behaviour), otherwise extract file directly to
@@ -303,11 +311,13 @@ class SdbGrid():
                 if keep_tree:
                     archive.extract(grid_zip_path, dest_dir)
                 else:
-                    with archive.open(grid_zip_path) as zipped_file, open(dest_path, 'wb') as dest_file:
+                    with archive.open(grid_zip_path) as zipped_file, open(
+                            dest_path, 'wb') as dest_file:
                         shutil.copyfileobj(zipped_file, dest_file)
 
     def extract_gyre_input_model(self, log_dir: str, top_dir: str, he4: float,
-                                 dest_dir: str, keep_tree: bool = False):
+                                 dest_dir: str,
+                                 keep_tree: bool = False) -> None:
         """Extracts a single GYRE input model.
 
         Parameters
@@ -319,8 +329,8 @@ class SdbGrid():
         he4 : float
             Central helium abundance of the required model.
         dest_dir : str
-            Destination directory for the extracted file if 'keep_tree' is False,
-            or the root direcotry if 'keep_tree' is True.
+            Destination directory for the extracted file if 'keep_tree'
+            is False, or the root direcotry if 'keep_tree' is True.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
             ZipFile.extract behaviour), otherwise extract file directly to
@@ -340,7 +350,8 @@ class SdbGrid():
                 if keep_tree:
                     archive.extract(grid_zip_path, dest_dir)
                 else:
-                    with archive.open(grid_zip_path) as zipped_file, open(dest_path, 'wb') as dest_file:
+                    with archive.open(grid_zip_path) as zipped_file, open(
+                            dest_path, 'wb') as dest_file:
                         shutil.copyfileobj(zipped_file, dest_file)
 
     def extract_log_dir(self, log_dir: str, top_dir: str, dest_dir: str):
@@ -367,7 +378,8 @@ class SdbGrid():
                 if f_name.startswith(grid_zip_path):
                     archive.extract(f_name, dest_dir)
 
-    def evol_model_exists(self, log_dir: str, top_dir: str, he4: float) -> bool:
+    def evol_model_exists(self, log_dir: str, top_dir: str,
+                          he4: float) -> bool:
         """Checks if a profile exists in archive.
 
         Parameters
@@ -395,7 +407,8 @@ class SdbGrid():
             else:
                 return False
 
-    def puls_model_exists(self, log_dir: str, top_dir: str, he4: float) -> bool:
+    def puls_model_exists(self, log_dir: str, top_dir: str,
+                          he4: float) -> bool:
         """Checks if a calculated GYRE model exists in archive.
 
         Parameters
@@ -423,7 +436,8 @@ class SdbGrid():
             else:
                 return False
 
-    def gyre_input_exists(self, log_dir: str, top_dir: str, he4: float) -> bool:
+    def gyre_input_exists(self, log_dir: str, top_dir: str,
+                          he4: float) -> bool:
         """Checks if a GYRE input model exists in archive.
 
         Parameters
@@ -486,7 +500,7 @@ class SdbGrid():
             Name of zipfile.
         """
 
-        return f"grid{top_dir[4:]}.zip"
+        return f'grid{top_dir[4:]}.zip'
 
     @staticmethod
     def evol_model_name(he4: float) -> str:
@@ -503,11 +517,12 @@ class SdbGrid():
             Name of MESA profile.
         """
 
-        return f"custom_He{round(he4, 6)}.data"
+        return f'custom_He{round(he4, 6)}.data'
 
     @staticmethod
     def puls_model_name(he4: float) -> str:
-        """Returns a name of a calculated GYRE model for helium abundance 'he4'.
+        """Returns a name of a calculated GYRE model for helium
+        abundance 'he4'.
 
         Parameters
         ----------
@@ -520,11 +535,12 @@ class SdbGrid():
             Name of calculated GYRE model.
         """
 
-        return f"custom_He{round(he4, 6)}_summary.txt"
+        return f'custom_He{round(he4, 6)}_summary.txt'
 
     @staticmethod
     def gyre_input_name(he4: float) -> str:
-        """Returns a name of an input model for GYRE model for helium abundance 'he4'.
+        """Returns a name of an input model for GYRE model for helium
+        abundance 'he4'.
 
         Parameters
         ----------
@@ -537,4 +553,4 @@ class SdbGrid():
             Name of GYRE input model.
         """
 
-        return f"custom_He{round(he4, 6)}.data.GYRE"
+        return f'custom_He{round(he4, 6)}.data.GYRE'

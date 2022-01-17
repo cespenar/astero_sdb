@@ -1,7 +1,7 @@
 import numpy as np
 
 
-class GyreData():
+class GyreData:
 
     """Structure containing data from a GYRE output file.
 
@@ -27,9 +27,9 @@ class GyreData():
     ----------
     file_name : str
         Path to the GYRE output file.
-    bulk_data : numpy.ndarray
+    body_data : numpy.ndarray
         The main data in the structured array format.
-    bulk_names : tuple of str
+    body_names : tuple of str
         List of all available data column names.
     header_data : dict
         Header data in dict format.
@@ -42,11 +42,11 @@ class GyreData():
     body_names_line = 6
 
     @classmethod
-    def set_header_names_line(cls, name_line: int = 2):
+    def set_header_names_line(cls, name_line: int = 2) -> None:
         cls.header_names_line = name_line
 
     @classmethod
-    def set_body_names_line(cls, name_line: int = 6):
+    def set_body_names_line(cls, name_line: int = 6) -> None:
         cls.bulk_names_line = name_line
 
     def __init__(self, file_name: str):
@@ -158,7 +158,7 @@ class GyreData():
         if self.is_in_header(key):
             return self.header_data[key]
         else:
-            raise KeyError(f"{key:s} is not a valid data type")
+            raise KeyError(f'{key:s} is not a valid data type')
 
     def data(self, key: str) -> np.ndarray:
         """Returns numpy array with the data column for 'key'.
@@ -171,7 +171,7 @@ class GyreData():
         Returns
         ----------
         numpy.ndarray
-            An array with data correspoding to the name 'key'.
+            An array with data corresponding to the name 'key'.
 
         Raises
         ----------
@@ -182,11 +182,11 @@ class GyreData():
         if self.is_in_data(key):
             return self.body_data[key]
         else:
-            raise KeyError(f"{key:s} is not a valid data type")
+            raise KeyError(f'{key:s} is not a valid data type')
 
     def periods(self, l: int, g_modes_only: bool = False,
                 use_seconds: bool = True) -> np.ndarray:
-        """Calculates periods from calculated freuencies given
+        """Calculates periods from calculated frequencies given
         in c/d.
 
         Parameters
@@ -217,9 +217,9 @@ class GyreData():
 
         return periods
 
-    def deltaP(self, l: int, use_seconds: bool = True,
-               reduced: bool = False) -> np.ndarray:
-        """Calculates perdiod spacing sequence for g-modes.
+    def delta_p(self, l: int, use_seconds: bool = True,
+                reduced: bool = False) -> np.ndarray:
+        """Calculates period spacing sequence for g-modes.
 
         Parameters
         ----------
@@ -233,12 +233,12 @@ class GyreData():
 
         Returns
         ----------
-        deltaP : numpy.ndarray
+        delta : numpy.ndarray
             Numpy array with period spacing.
         """
 
         l_factor = np.sqrt(l * (l + 1)) if reduced else 1.0
         periods = l_factor * \
             self.periods(l=l, g_modes_only=True, use_seconds=use_seconds)
-        deltaP = periods[0:len(periods)-1] - periods[1:]
-        return deltaP
+        delta = periods[0:len(periods)-1] - periods[1:]
+        return delta
