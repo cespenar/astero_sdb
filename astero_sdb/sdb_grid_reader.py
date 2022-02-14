@@ -36,14 +36,13 @@ class SdbGrid:
     >>> grid_dir = 'grid_sdb'
     >>> g = SdbGrid(database, grid_dir)
 
-    Here `database` is the database containing the processed grid of
-    calcualted MESA sdB models and `grid_dir` is the directory containing
-    the full compressed grid. The grid is then initialized.
+    Here `database` is the database containing the processed grid of calcualted
+    MESA sdB models and `grid_dir` is the directory containing the full
+    compressed grid. The grid is then initialized.
     """
 
     def __init__(self, db_file: str, grid_dir: str):
-        """Creates SdbGrid object from a processed
-        grid of MESA sdB models.
+        """Creates SdbGrid object from a processed grid of MESA sdB models.
 
         Parameters
         ----------
@@ -59,8 +58,8 @@ class SdbGrid:
         self.data = pd.read_sql('models', engine)
 
     def __str__(self):
-        return (f'SdbGrid based on \'{self.db_file}\' '
-                f'database and with models located at \'{self.grid_dir}\'')
+        return (f'SdbGrid based on "{self.db_file}" '
+                f'database and with models located at "{self.grid_dir}"')
 
     def __repr__(self):
         return f'SdbGrid(db_file={self.db_file}, grid_dir={self.grid_dir})'
@@ -69,8 +68,7 @@ class SdbGrid:
                      dest_dir: str = '.', delete_file: bool = True,
                      rename: bool = False,
                      keep_tree: bool = False) -> mesa.MesaData:
-        """Reads a a MESA history file and returns
-        a MesaData object.
+        """Reads a MESA history file and returns a MesaData object.
 
         Parameters
         ----------
@@ -79,16 +77,16 @@ class SdbGrid:
         top_dir : str
             Top directory.
         dest_dir : str, optional
-            Temporary dirctory for the required track. Default: '.'.
+            Temporary directory for the required track. Default: '.'.
         delete_file : bool, optional
-            If True delete the extracted track. The track is not deleted
-            if 'keep_tree' is True. Default: True.
+            If True delete the extracted track. The track is not deleted if
+            'keep_tree' is True. Default: True.
         rename : bool, optional
             If True it renames the history file to include information about
             the model contained in log_dir.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
-            ZipFile.extract behaviour), otherwise extract file directly to
+            ZipFile.extract() behaviour), otherwise extract file directly to
             'dest_dir'. Default: False.
 
         Returns
@@ -116,8 +114,8 @@ class SdbGrid:
     def read_evol_model(self, log_dir: str, top_dir: str, he4: float,
                         dest_dir: str = '.', delete_file: bool = True,
                         keep_tree: bool = False) -> mesa.MesaData:
-        """Reads a single evolutionary model (a profile) and returns
-        a MesaData object.
+        """Reads a single evolutionary model (a profile) and returns a MesaData
+        object.
 
         Parameters
         ----------
@@ -128,13 +126,13 @@ class SdbGrid:
         he4 : float
             Central helium abundance of the required model.
         dest_dir : str, optional
-            Dirctory for the required model. Default: '.'.
+            Directory for the required model. Default: '.'.
         delete_file : bool, optional
-            If True delete the extracted model. The model is not deleted
-            if 'keep_tree' is True. Default: True.
+            If True delete the extracted model. The model is not deleted if
+            'keep_tree' is True. Default: True.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
-            ZipFile.extract behaviour), otherwise extract file directly to
+            ZipFile.extract() behaviour), otherwise extract file directly to
             'dest_dir'. Default: False.
 
         Returns
@@ -158,8 +156,7 @@ class SdbGrid:
     def read_puls_model(self, log_dir: str, top_dir: str, he4: float,
                         dest_dir: str = '.', delete_file: bool = True,
                         keep_tree=False) -> GyreData:
-        """Reads a calculated GYRE model and returns
-        a GyreData object.
+        """Reads a calculated GYRE model and returns a GyreData object.
 
         Parameters
         ----------
@@ -170,13 +167,13 @@ class SdbGrid:
         he4 : float
             Central helium abundance of the required model.
         dest_dir : str, optional
-            Temporary dirctory for the required model. Default: '.'.
+            Temporary directory for the required model. Default: '.'.
         delete_file : bool, optional
-            If True delete the extracted model. The model is not deleted
-            if 'keep_tree' is True. Default: True.
+            If True delete the extracted model. The model is not deleted if
+            'keep_tree' is True. Default: True.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
-            ZipFile.extract behaviour), otherwise extract file directly to
+            ZipFile.extract() behaviour), otherwise extract file directly to
             'dest_dir'. Default: False.
 
         Returns
@@ -209,14 +206,14 @@ class SdbGrid:
         top_dir : str
             Top directory.
         dest_dir : str
-            Destination directory for the extracted model if 'keep_tree'
-            is False, or the root direcotry if 'keep_tree' is True.
+            Destination directory for the extracted model if 'keep_tree' is
+            False, or the root directory if 'keep_tree' is True.
         rename : bool
             If True it renames the history file to include information about
             the model contained in log_dir. Default: False.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
-            ZipFile.extract behaviour), otherwise extract file directly to
+            ZipFile.extract() behaviour), otherwise extract file directly to
             'dest_dir'. Default: False.
 
         Returns
@@ -252,11 +249,11 @@ class SdbGrid:
         he4 : float
             Central helium abundance of the required model.
         dest_dir : str
-            Destination directory for the extracted model if 'keep_tree'
-            is False, or the root direcotry if 'keep_tree' is True.
+            Destination directory for the extracted model if 'keep_tree' is
+            False, or the root directory if 'keep_tree' is True.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
-            ZipFile.extract behaviour), otherwise extract file directly to
+            ZipFile.extract() behaviour), otherwise extract file directly to
             'dest_dir'. Default: False.
 
         Returns
@@ -290,11 +287,11 @@ class SdbGrid:
         he4 : float
             Central helium abundance of the required model.
         dest_dir : str
-            Destination directory for the extracted model if 'keep_tree'
-            is False, or the root direcotry if 'keep_tree' is True.
+            Destination directory for the extracted model if 'keep_tree' is
+            False, or the root directory if 'keep_tree' is True.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
-            ZipFile.extract behaviour), otherwise extract file directly to
+            ZipFile.extract() behaviour), otherwise extract file directly to
             'dest_dir'. Default: False.
 
         Returns
@@ -329,11 +326,11 @@ class SdbGrid:
         he4 : float
             Central helium abundance of the required model.
         dest_dir : str
-            Destination directory for the extracted file if 'keep_tree'
-            is False, or the root direcotry if 'keep_tree' is True.
+            Destination directory for the extracted file if 'keep_tree' is
+            False, or the root directory if 'keep_tree' is True.
         keep_tree : bool, optional
             If True extract file with its directory structure (default
-            ZipFile.extract behaviour), otherwise extract file directly to
+            ZipFile.extract() behaviour), otherwise extract file directly to
             'dest_dir'. Default: False.
 
         Returns
@@ -467,7 +464,7 @@ class SdbGrid:
 
     @staticmethod
     def model_extracted(path: str) -> bool:
-        """Checks if model is already exracted.
+        """Checks if model is already extracted.
 
         Parameters
         ----------
@@ -487,7 +484,7 @@ class SdbGrid:
 
     @staticmethod
     def archive_name(top_dir: str) -> str:
-        """Returns a name of a zip file containing a top direcotry.
+        """Returns a name of a zip file containing a top directory.
 
         Parameters
         ----------
@@ -521,8 +518,8 @@ class SdbGrid:
 
     @staticmethod
     def puls_model_name(he4: float) -> str:
-        """Returns a name of a calculated GYRE model for helium
-        abundance 'he4'.
+        """Returns a name of a calculated GYRE model for helium abundance
+        'he4'.
 
         Parameters
         ----------

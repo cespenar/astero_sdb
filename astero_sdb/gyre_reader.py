@@ -2,7 +2,6 @@ import numpy as np
 
 
 class GyreData:
-
     """Structure containing data from a GYRE output file.
 
         Assumes the following structure of a file:
@@ -89,9 +88,9 @@ class GyreData:
 
         """
 
-        self.body_data = np.genfromtxt(
-            self.file_name, skip_header=GyreData.body_names_line - 1,
-            names=True, dtype=None)
+        self.body_data = np.genfromtxt(self.file_name,
+                                       skip_header=GyreData.body_names_line - 1,
+                                       names=True, dtype=None)
 
         self.body_names = self.body_data.dtype.names
 
@@ -184,15 +183,15 @@ class GyreData:
         else:
             raise KeyError(f'{key:s} is not a valid data type')
 
-    def periods(self, l: int, g_modes_only: bool = False,
+    def periods(self, deg: int, g_modes_only: bool = False,
                 use_seconds: bool = True) -> np.ndarray:
         """Calculates periods from calculated frequencies given
         in c/d.
 
         Parameters
         ----------
-        l : int
-            Spherical degree of modes.
+        deg : int
+            Spherical degree of modes, l.
         g_modes_only : bool, optional
             If True calculates periods only for g-modes. Default: False.
         use_seconds : bool, optional
@@ -205,26 +204,26 @@ class GyreData:
         """
 
         if g_modes_only:
-            selection = (self.data('l') == l) & (self.data("n_pg") < 0)
+            selection = (self.data('l') == deg) & (self.data("n_pg") < 0)
         else:
-            selection = (self.data('l') == l)
+            selection = (self.data('l') == deg)
 
         if use_seconds:
             periods = 1.0 / \
-                self.data('Refreq')[selection] * self.seconds_in_day
+                      self.data('Refreq')[selection] * self.seconds_in_day
         else:
             periods = 1.0 / self.data('Refreq')[selection]
 
         return periods
 
-    def delta_p(self, l: int, use_seconds: bool = True,
+    def delta_p(self, deg: int, use_seconds: bool = True,
                 reduced: bool = False) -> np.ndarray:
         """Calculates period spacing sequence for g-modes.
 
         Parameters
         ----------
-        l : int
-            Mode's spherical degree.
+        deg : int
+            Mode's spherical degree, l.
         use_seconds : bool, optional
             Results in seconds if true, otherwise in days. Default: True.
         reduced : bool, optional
@@ -237,8 +236,8 @@ class GyreData:
             Numpy array with period spacing.
         """
 
-        l_factor = np.sqrt(l * (l + 1)) if reduced else 1.0
-        periods = l_factor * \
-            self.periods(l=l, g_modes_only=True, use_seconds=use_seconds)
-        delta = periods[0:len(periods)-1] - periods[1:]
+        l_factor = np.sqrt(deg * (deg + 1)) if reduced else 1.0
+        periods = l_factor * self.periods(deg=deg, g_modes_only=True,
+                                          use_seconds=use_seconds)
+        delta = periods[0:len(periods) - 1] - periods[1:]
         return delta

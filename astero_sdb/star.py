@@ -101,8 +101,8 @@ class Star:
         self.rad_err_p = rad_err_p
         self.rad_err_m = rad_err_m
         if frequencies_list:
-            self.frequencies = np.genfromtxt(
-                frequencies_list, dtype=None, skip_header=1, names=True)
+            self.frequencies = np.genfromtxt(frequencies_list, dtype=None,
+                                             skip_header=1, names=True)
         else:
             self.frequencies = None
 
@@ -142,24 +142,25 @@ class Star:
             self.frequencies['idm'][~np.isnan(self.frequencies['idm'])])
 
     def period_combinations(self):
-        """Finds all possible combinations of periods
-        for identified triplets and doublets.
+        """Finds all possible combinations of periods for identified triplets
+        and doublets.
 
         Returns
         -------
         list[dict]
-            List of dictionaries containing combinations
-            of periods. Supplemented with ID and l.
+            List of dictionaries containing combinations of periods.
+            Supplemented with ID and l.
         """
 
         periods = [{}, ]
         id_multiplets = self.unique_multiplet_ids()
         for id in id_multiplets:
             df_multi = self.frequencies[self.frequencies['idm'] == id]
-            l = df_multi['l'][0]
+            deg = df_multi['l'][0]
             if len(df_multi) == 3:
                 for p_dict in periods:
-                    p_dict[df_multi['id'][1]] = {'P': df_multi['P'][1], 'l': l}
+                    p_dict[df_multi['id'][1]] = {'P': df_multi['P'][1],
+                                                 'l': deg}
             if len(df_multi) == 2:
                 if (df_multi['m'][0] == -1) and (df_multi['m'][1] == 1):
                     for p_dict in periods:
@@ -167,39 +168,36 @@ class Star:
                             (df_multi['id'][0] + df_multi['id'][1]) / 2.0, 1)
                         p_middle = round(
                             (df_multi['P'][0] + df_multi['P'][1]) / 2.0, 5)
-                        p_dict[id_middle] = {'P': p_middle, 'l': l}
+                        p_dict[id_middle] = {'P': p_middle, 'l': deg}
                 else:
                     periods_temp = []
                     for p_dict in periods:
                         p_dict_temp = deepcopy(p_dict)
                         p_dict[df_multi['id'][0]] = {
-                            'P': df_multi['P'][0], 'l': l}
+                            'P': df_multi['P'][0], 'l': deg}
                         p_dict_temp[df_multi['id'][1]] = {
-                            'P': df_multi['P'][1], 'l': l}
+                            'P': df_multi['P'][1], 'l': deg}
                         periods_temp.append(p_dict_temp)
                     for p_dict in periods_temp:
                         periods.append(p_dict)
             if len(df_multi) == 1:
                 for p_dict in periods:
-                    p_dict[df_multi['id'][0]] = {'P': df_multi['P'][0], 'l': l}
+                    p_dict[df_multi['id'][0]] = {'P': df_multi['P'][0],
+                                                 'l': deg}
         return periods
 
     def chi2_star(self, df_selected: DataFrame,
                   use_z_surf: bool = True) -> None:
-        """Calculates chi^2 function for the star
-        and models provided in the given grid. Utilizes
-        availalbe global stellar parameters.
+        """Calculates chi^2 function for the star and models provided in the
+        given grid. Utilizes available global stellar parameters.
 
         Parameters
         ----------
-        star : Star
-            A star for which chi^2 function is calculated.
         df_selected : pandas.DataFrame
             Pandas DataFrame containing the grid.
         use_z_surf : bool, optional
-            If True uses surface Z for selection of [Fe/H],
-            otherwise uses initial Z of progenitor.
-            Default: True.
+            If True uses surface Z for selection of [Fe/H], otherwise uses
+            initial Z of progenitor. Default: True.
 
         Returns
         -------
@@ -248,26 +246,24 @@ class Star:
                   save_period_list: bool = False,
                   period_list_name: str = None,
                   progress: bool = True) -> None:
-        """Calculates chi^2 function for the star
-        and a grid using availiable pulsation periods.
+        """Calculates chi^2 function for the star and a grid using available
+        pulsation periods.
 
         Parameters
         ----------
         df_selected : pandas.DataFrame
-            Pandas DataFrame containing the models selected
-            for chi^2 calculation.
+            Pandas DataFrame containing the models selected for chi^2
+            calculation.
         grid : SdbGrid
             Complete grid of sdB models.
         dest_dir : str
             Target root directory for extracted models.
         save_period_list : bool, optional
-            If True creates a file with listed all
-            combinations of periods used to calculate chi^2
-            fucntion.
+            If True creates a file with listed all combinations of periods used
+            to calculate chi^2 function.
         period_list_name : str, optional
-            Name of output file saved when save_period_list
-            is True. If None default name is used.
-            Default: None.
+            Name of output file saved when save_period_list is True. If None
+            default name is used. Default: None.
         progress: bool, optional
             If true shows a progress bar. Default: True.
 
@@ -337,40 +333,35 @@ class Star:
         Parameters
         ----------
         df_selected : pandas.DataFrame
-            Pandas DataFrame containing the models selected
-            for chi^2 calculation.
+            Pandas DataFrame containing the models selected for chi^2
+            calculation.
         grid : SdbGrid
             Complete grid of sdB models.
         dest_dir : str
             Target root directory for extracted models.
         use_spectroscopy : bool, optional
-            If True calculates chi^2 using available spectroscopic
-            parameters. Default: True.
+            If True calculates chi^2 using available spectroscopic parameters.
+            Default: True.
         use_periods : bool, optional
-            If True calculates chi^2 using availiable pulsational
-            periods. Default: True. 
+            If True calculates chi^2 using available pulsational periods.
+            Default: True.
         save_period_list : bool, optional
-            If True creates a file with listed all
-            combinations of periods used to calculate chi^2
-            fucntion.
+            If True creates a file with listed all combinations of periods used
+            to calculate chi^2 function.
         period_list_name : str, optional
-            Name of output file saved when save_period_list
-            is True. If None default name is used.
-            Default: None.
+            Name of output file saved when save_period_list is True. If None
+            default name is used. Default: None.
         progress: bool, optional
             If true shows a progress bar. Default: True.
         use_z_surf : bool, optional
-            If True uses surface Z for selection of [Fe/H],
-            otherwise uses initial Z of progenitor.
-            Default: True.
+            If True uses surface Z for selection of [Fe/H], otherwise uses
+            initial Z of progenitor. Default: True.
         save_results : bool, optional
-            If True saves the DataFrame containing calculated
-            values of chi^2 to a text file.
-            Default: True.
+            If True saves the DataFrame containing calculated values of chi^2
+            to a text file. Default: True.
         results_file_name : str, optional
-            Name of the output file containing values of chi^2.
-            If not provided default name is used.
-            Default: None.
+            Name of the output file containing values of chi^2. If not provided
+            default name is used. Default: None.
 
         Returns
         -------
@@ -400,33 +391,27 @@ class Star:
                          use_vrot: bool = False,
                          use_feh: bool = False,
                          use_z_surf: bool = False) -> DataFrame:
-        """Selects models from a grid based on the observational
-        parameters of the star.
+        """Selects models from a grid based on the observational parameters of
+        the star.
 
         Parameters
         ----------
         grid : SdbGrid
             A grid of sdB stars.
         sigma : float, optional
-            Size of the considered error box expressed
-            as a multiplier of error.
-            Default: 1.0.
+            Size of the considered error box expressed as a multiplier of
+            error. Default: 1.0.
         use_teff : bool, optional
-            If True uses effective temperature for selection.
-            Default: True.
+            If True uses effective temperature for selection. Default: True.
         use_logg : bool, optional
-            If True uses log_g for selection.
-            Default: True.
+            If True uses log_g for selection. Default: True.
         use_vrot : bool, optional
-            If True uses rotational velocity for selection.
-            Default: False.
+            If True uses rotational velocity for selection. Default: False.
         use_feh : bool, optional
-            If True uses metallicity for selection.
-            Default: False.
+            If True uses metallicity for selection. Default: False.
         use_z_surf : bool, optional
-            If True uses surface Z for selection of [Fe/H], otherwise
-            uses initial Z of progenitor.
-            Default: False.
+            If True uses surface Z for selection of [Fe/H], otherwise uses
+            initial Z of progenitor. Default: False.
 
         Returns
         ----------
@@ -472,7 +457,7 @@ class Star:
     @staticmethod
     def calc_feh(z: float) -> float:
         """Calculates [Fe/H] from metallicity.
-        Assumes solar chemical compostion from Asplund et al. (2009).
+        Assumes solar chemical composition from Asplund et al. (2009).
 
         Parameters
         ----------
