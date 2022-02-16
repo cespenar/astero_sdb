@@ -219,9 +219,8 @@ class Star:
                     periods[df_multi['id'][1]] = {'P': df_multi['P'][1],
                                                   'l': deg}
             if len(df_multi) == 1:
-                for p_dict in periods:
-                    p_dict[df_multi['id'][0]] = {'P': df_multi['P'][0],
-                                                 'l': deg}
+                periods[df_multi['id'][0]] = {'P': df_multi['P'][0],
+                                              'l': deg}
         return [periods]
 
     def chi2_star(self, df_selected: DataFrame,
