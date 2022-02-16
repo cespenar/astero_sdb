@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='astero_sdb',
-      version='0.0.23',
+      version='0.0.24',
       description='Tools for asteroseismology of sdB stars using MESA and GYRE models.',
       url='https://github.com/cespenar/astero_sdb',
       author='Jakub Ostrowski',

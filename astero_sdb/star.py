@@ -141,7 +141,7 @@ class Star:
         return np.unique(
             self.frequencies['idm'][~np.isnan(self.frequencies['idm'])])
 
-    def period_combinations(self):
+    def period_combinations(self) -> list[dict]:
         """Finds all possible combinations of periods for identified triplets
         and doublets.
 
@@ -185,6 +185,44 @@ class Star:
                     p_dict[df_multi['id'][0]] = {'P': df_multi['P'][0],
                                                  'l': deg}
         return periods
+
+    def periods_explicit(self) -> list[dict]:
+        """Lists all identified periods explicitly taking into account values
+        of m provided in the list of frequencies and returns them in format
+        compatible with self.period_combinations().
+
+        Returns
+        -------
+        list[dict]
+            List of dictionaries containing periods, supplemented with ID
+            and l.
+        """
+
+        periods = {}
+        id_multiplets = self.unique_multiplet_ids()
+        for id in id_multiplets:
+            df_multi = self.frequencies[self.frequencies['idm'] == id]
+            deg = df_multi['l'][0]
+            if len(df_multi) == 3:
+                periods[df_multi['id'][1]] = {'P': df_multi['P'][1], 'l': deg}
+            if len(df_multi) == 2:
+                if (df_multi['m'][0] == -1) and (df_multi['m'][1] == 1):
+                    id_middle = round(
+                        (df_multi['id'][0] + df_multi['id'][1]) / 2.0, 1)
+                    p_middle = round(
+                        (df_multi['P'][0] + df_multi['P'][1]) / 2.0, 5)
+                    periods[id_middle] = {'P': p_middle, 'l': deg}
+                if df_multi['m'][0] == 0:
+                    periods[df_multi['id'][0]] = {'P': df_multi['P'][0],
+                                                  'l': deg}
+                else:
+                    periods[df_multi['id'][1]] = {'P': df_multi['P'][1],
+                                                  'l': deg}
+            if len(df_multi) == 1:
+                for p_dict in periods:
+                    p_dict[df_multi['id'][0]] = {'P': df_multi['P'][0],
+                                                 'l': deg}
+        return [periods]
 
     def chi2_star(self, df_selected: DataFrame,
                   use_z_surf: bool = True) -> None:
@@ -243,6 +281,7 @@ class Star:
                   df_selected: DataFrame,
                   grid: SdbGrid,
                   dest_dir: str,
+                  ignore_combinations: bool = True,
                   save_period_list: bool = False,
                   period_list_name: str = None,
                   progress: bool = True) -> None:
@@ -258,6 +297,9 @@ class Star:
             Complete grid of sdB models.
         dest_dir : str
             Target root directory for extracted models.
+        ignore_combinations : bool, optional
+            If True ignores potential combinations of periods due to missing
+            components of multiplets. Default: True.
         save_period_list : bool, optional
             If True creates a file with listed all combinations of periods used
             to calculate chi^2 function.
@@ -272,7 +314,10 @@ class Star:
 
         """
 
-        period_combinations = self.period_combinations()
+        if ignore_combinations:
+            period_combinations = self.periods_explicit()
+        else:
+            period_combinations = self.period_combinations()
 
         if save_period_list:
             if period_list_name:
@@ -322,6 +367,7 @@ class Star:
                       dest_dir: str,
                       use_spectroscopy: bool = True,
                       use_periods: bool = True,
+                      ignore_combinations: bool = True,
                       save_period_list: bool = False,
                       period_list_name: str = None,
                       progress: bool = True,
@@ -345,6 +391,9 @@ class Star:
         use_periods : bool, optional
             If True calculates chi^2 using available pulsational periods.
             Default: True.
+        ignore_combinations : bool, optional
+            If True ignores potential combinations of periods due to missing
+            components of multiplets. Default: True.
         save_period_list : bool, optional
             If True creates a file with listed all combinations of periods used
             to calculate chi^2 function.
@@ -371,8 +420,10 @@ class Star:
         if use_spectroscopy:
             self.chi2_star(df_selected=df_selected, use_z_surf=use_z_surf)
         if use_periods:
-            self.chi2_puls(df_selected=df_selected, grid=grid,
+            self.chi2_puls(df_selected=df_selected,
+                           grid=grid,
                            dest_dir=dest_dir,
+                           ignore_combinations=ignore_combinations,
                            save_period_list=save_period_list,
                            period_list_name=period_list_name,
                            progress=progress)
