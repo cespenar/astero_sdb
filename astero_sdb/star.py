@@ -213,7 +213,7 @@ class Star:
                     p_middle = round(
                         (df_multi['P'][0] + df_multi['P'][1]) / 2.0, 5)
                     periods[id_middle] = {'P': p_middle, 'l': deg}
-                if df_multi['m'][0] == 0:
+                elif df_multi['m'][0] == 0:
                     periods[df_multi['id'][0]] = {'P': df_multi['P'][0],
                                                   'l': deg}
                 else:
