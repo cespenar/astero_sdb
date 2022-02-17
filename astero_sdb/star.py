@@ -1,9 +1,10 @@
 from copy import deepcopy
 
 import numpy as np
-from astero_sdb.sdb_grid_reader import SdbGrid
 from pandas.core.frame import DataFrame
 from tqdm import tqdm
+
+from .sdb_grid_reader import SdbGrid
 
 
 class Star:

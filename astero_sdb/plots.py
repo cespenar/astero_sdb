@@ -1,11 +1,12 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-from astero_sdb.gyre_reader import GyreData
-from astero_sdb.sdb_grid_reader import SdbGrid
-from astero_sdb.star import Star
 from matplotlib.patches import Rectangle
 from pandas.core.frame import DataFrame, Series
+
+from .gyre_reader import GyreData
+from .sdb_grid_reader import SdbGrid
+from .star import Star
 
 plt.rcParams['legend.frameon'] = False
 plt.rcParams['legend.labelspacing'] = 0.1
@@ -24,8 +25,7 @@ def plot_hr_logg_teff(targets: list[Star],
                       label_x: float = None,
                       label_y: float = None,
                       x_lim: tuple = None,
-                      y_lim: tuple = None,
-                      ) -> None:
+                      y_lim: tuple = None) -> None:
     plt.figure()
     plt.gca().invert_xaxis()
     plt.gca().invert_yaxis()
