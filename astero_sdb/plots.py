@@ -145,16 +145,13 @@ def save_best_info(star_name: str,
             f'{"age":>5}',
             f'{"m_sdb":>6}',
             f'{"r_sdb":>6}',
-            f'{"chi2_old":>8}',
-            f'{"chi2_new":>8}',
             '\n',
         ])
         f.write(header)
 
         for _, model in df[['id', f'{column}', 'z_i', 'm_i', 'm_env', 'y_i',
                             'he4', 'log_Teff', 'log_L', 'log_g', 'age', 'm',
-                            'radius', 'chi2_star_1',
-                            'chi2_star_2']].sort_values(f'{column}').head(
+                            'radius']].sort_values(f'{column}').head(
             number_of_models).iterrows():
             row = ' '.join([
                 f'{model.id:>6.0f}',
@@ -170,8 +167,6 @@ def save_best_info(star_name: str,
                 f'{model.age / 1e9:>5.3f}',
                 f'{model.m:>6.4f}',
                 f'{model.radius:>6.4f}',
-                f'{model.chi2_star_1:>8.2f}',
-                f'{model.chi2_star_2:>8.2f}',
                 '\n'
             ])
             f.write(row)
@@ -206,7 +201,8 @@ def plot_modes(star: Star,
                                  model=model,
                                  col=column,
                                  output=output,
-                                 x_lim=x_lim)
+                                 x_lim=x_lim,
+                                 star_name=star_name)
 
 
 def _plot_modes_single_model(star: Star,
@@ -215,6 +211,7 @@ def _plot_modes_single_model(star: Star,
                              col: str,
                              output: Path,
                              x_lim: tuple,
+                             star_name: str,
                              plot_legend: bool = False,
                              legend_loc: str = None) -> None:
     w, h = plt.figaspect(0.3)
@@ -228,7 +225,7 @@ def _plot_modes_single_model(star: Star,
                linestyles='dotted', linewidth=4)
 
     plt.text(200, 1.05,
-             f'{star.name}'
+             f'{star_name}'
              fr'$,\/\chi^2={model[f"{col}"]:.2f},\/$'
              fr'$\mathrm{{id}}={model.id},\/Z_\mathrm{{i}}={model.z_i:.3f},\/$'
              fr'$Y_\mathrm{{i}}={model.y_i:.4f},\/M_\mathrm{{i}}={model.m_i:.2f}\,M_\odot,\/$'
