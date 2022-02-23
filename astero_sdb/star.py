@@ -192,6 +192,9 @@ class Star:
         of m provided in the list of frequencies and returns them in format
         compatible with self.period_combinations().
 
+        If a selected period is an average of two periods, the id of
+        a component with a negative m is used.
+
         Returns
         -------
         list[dict]
@@ -204,24 +207,19 @@ class Star:
         for id in id_multiplets:
             df_multi = self.frequencies[self.frequencies['idm'] == id]
             deg = df_multi['l'][0]
-            if len(df_multi) == 3:
-                periods[df_multi['id'][1]] = {'P': df_multi['P'][1], 'l': deg}
-            if len(df_multi) == 2:
-                if (df_multi['m'][0] == -1) and (df_multi['m'][1] == 1):
-                    id_middle = round(
-                        (df_multi['id'][0] + df_multi['id'][1]) / 2.0, 1)
-                    p_middle = round(
-                        (df_multi['P'][0] + df_multi['P'][1]) / 2.0, 5)
-                    periods[id_middle] = {'P': p_middle, 'l': deg}
-                elif df_multi['m'][0] == 0:
-                    periods[df_multi['id'][0]] = {'P': df_multi['P'][0],
-                                                  'l': deg}
-                else:
-                    periods[df_multi['id'][1]] = {'P': df_multi['P'][1],
-                                                  'l': deg}
-            if len(df_multi) == 1:
-                periods[df_multi['id'][0]] = {'P': df_multi['P'][0],
+            if 0 in df_multi['m']:
+                i = df_multi['m'].tolist().index(0)
+                periods[df_multi['id'][i]] = {'P': df_multi['P'][i],
                                               'l': deg}
+            else:
+                for m in np.sort(np.unique(np.abs(df_multi['m']))):
+                    if -m in df_multi['m'] and m in df_multi['m']:
+                        im = df_multi['m'].tolist().index(-m)
+                        ip = df_multi['m'].tolist().index(m)
+                        p_middle = round(
+                            (df_multi['P'][im] + df_multi['P'][ip]) / 2.0, 5)
+                        periods[df_multi['id'][im]] = {'P': p_middle, 'l': deg}
+                        break
         return [periods]
 
     def chi2_star(self, df_selected: DataFrame,
