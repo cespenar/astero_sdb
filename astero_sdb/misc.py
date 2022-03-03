@@ -2,6 +2,44 @@ import numpy as np
 from mesa_reader import MesaData
 
 
+def zaehb_index(history_data: MesaData) -> int:
+    """Finds index of the ZAEHB model.
+
+    Parameters
+    ----------
+    history_data : mesa_reader.MesaData
+        Evolutionary track (MESA history file) as MesaData object.
+
+    Returns
+    ----------
+    int
+        Index of the ZAEHB model.
+
+    """
+
+    return history_data.model_number[history_data.mass_conv_core > 0.0][0] - 1
+
+
+def zaehb_age(history_data: MesaData,
+              zaehb_index: int) -> float:
+    """Finds age of the ZAEHB model calculated from the beginning of the PMS
+    evolution.
+
+    Parameters
+    ----------
+    history_data : mesa_reader.MesaData
+        Evolutionary track (MESA history file) as MesaData object.
+
+    Returns
+    ----------
+    int
+        Age of the ZAEHB model.
+
+    """
+
+    return history_data.star_age[zaehb_index]
+
+
 def find_semiconvection_bottom(profile: MesaData,
                                verbose: bool = False) -> int:
     """Finds the zone where the natural semiconvection starts in a MESA model.
