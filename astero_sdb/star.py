@@ -1,4 +1,6 @@
 from copy import deepcopy
+from pathlib import Path
+from typing import Union
 
 import numpy as np
 from pandas.core.frame import DataFrame
@@ -34,7 +36,7 @@ class Star:
                  rad: float = None,
                  rad_err_p: float = None,
                  rad_err_m: float = None,
-                 frequencies_list: str = None):
+                 frequencies_list: Union[str, Path] = None):
         """Creates a Star object using provided observational data.
 
         Parameters
@@ -77,7 +79,7 @@ class Star:
             Plus-error of radius. Default: None.
         rad_err_m : float, optional
             Minus-error of radius. Default: None.
-        frequencies_list : str, optional
+        frequencies_list : Union[str, Path], optional
             Text file containing list of observed frequencies.
             Default: None.
         """
@@ -278,7 +280,7 @@ class Star:
     def chi2_puls(self,
                   df_selected: DataFrame,
                   grid: SdbGrid,
-                  dest_dir: str,
+                  dest_dir: Path,
                   ignore_combinations: bool = True,
                   save_period_list: bool = False,
                   period_list_name: str = None,
@@ -293,7 +295,7 @@ class Star:
             calculation.
         grid : SdbGrid
             Complete grid of sdB models.
-        dest_dir : str
+        dest_dir : Path
             Target root directory for extracted models.
         ignore_combinations : bool, optional
             If True ignores potential combinations of periods due to missing
@@ -319,11 +321,11 @@ class Star:
 
         if save_period_list:
             if period_list_name:
-                f_name = period_list_name
+                f_name = Path(period_list_name)
             else:
-                f_name = f'{self.name}_periods.txt'
+                f_name = Path(f'{self.name}_periods.txt')
 
-            with open(f_name, 'w') as f:
+            with f_name.open(mode='w') as f:
                 f.write(f'{self.name}\n')
                 f.write(f'{len(period_combinations)} period combinations\n\n')
                 for i, p_dict in enumerate(period_combinations):
@@ -362,7 +364,7 @@ class Star:
     def evaluate_chi2(self,
                       df_selected: DataFrame,
                       grid: SdbGrid,
-                      dest_dir: str,
+                      dest_dir: Path,
                       use_spectroscopy: bool = True,
                       use_periods: bool = True,
                       ignore_combinations: bool = True,
@@ -381,7 +383,7 @@ class Star:
             calculation.
         grid : SdbGrid
             Complete grid of sdB models.
-        dest_dir : str
+        dest_dir : Path
             Target root directory for extracted models.
         use_spectroscopy : bool, optional
             If True calculates chi^2 using available spectroscopic parameters.
@@ -427,9 +429,9 @@ class Star:
                            progress=progress)
         if save_results:
             if results_file_name:
-                f_name = results_file_name
+                f_name = Path(results_file_name)
             else:
-                f_name = f'{self.name}_chi2.txt'
+                f_name = Path(f'{self.name}_chi2.txt')
             df_selected.to_csv(f_name, sep=' ', header=True, index=False)
 
     def df_from_errorbox(self,
