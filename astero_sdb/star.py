@@ -224,7 +224,8 @@ class Star:
                         break
         return [periods]
 
-    def chi2_star(self, df_selected: DataFrame,
+    def chi2_star(self,
+                  df_selected: DataFrame,
                   use_z_surf: bool = True) -> None:
         """Calculates chi^2 function for the star and models provided in the
         given grid. Utilizes available global stellar parameters.
