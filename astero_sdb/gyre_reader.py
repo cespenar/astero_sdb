@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 
 
@@ -19,12 +21,12 @@ class GyreData:
 
     Parameters
     ----------
-    file_name : str
+    file_name : Path
         The name of GYRE output file to be read in.
 
     Attributes
     ----------
-    file_name : str
+    file_name : Path
         Path to the GYRE output file.
     body_data : numpy.ndarray
         The main data in the structured array format.
@@ -48,7 +50,7 @@ class GyreData:
     def set_body_names_line(cls, name_line: int = 6) -> None:
         cls.bulk_names_line = name_line
 
-    def __init__(self, file_name: str):
+    def __init__(self, file_name: Path):
         """Make a GyreData object from a GYRE output file.
 
         Assumes the following structure of a file:
@@ -66,7 +68,7 @@ class GyreData:
 
         Parameters
         ----------
-        file_name : str
+        file_name : Path
             The name of GYRE output file to be read in.
         """
 
@@ -90,12 +92,13 @@ class GyreData:
 
         self.body_data = np.genfromtxt(self.file_name,
                                        skip_header=GyreData.body_names_line - 1,
-                                       names=True, dtype=None)
+                                       names=True,
+                                       dtype=None)
 
         self.body_names = self.body_data.dtype.names
 
         header_data = []
-        with open(self.file_name) as f:
+        with self.file_name.open() as f:
             for i, line in enumerate(f):
                 if i == GyreData.header_names_line - 1:
                     self.header_names = line.split()
@@ -183,10 +186,11 @@ class GyreData:
         else:
             raise KeyError(f'{key:s} is not a valid data type')
 
-    def periods(self, deg: int, g_modes_only: bool = False,
+    def periods(self,
+                deg: int,
+                g_modes_only: bool = False,
                 use_seconds: bool = True) -> np.ndarray:
-        """Calculates periods from calculated frequencies given
-        in c/d.
+        """Calculates periods from calculated frequencies given in c/d.
 
         Parameters
         ----------
@@ -204,7 +208,7 @@ class GyreData:
         """
 
         if g_modes_only:
-            selection = (self.data('l') == deg) & (self.data("n_pg") < 0)
+            selection = (self.data('l') == deg) & (self.data('n_pg') < 0)
         else:
             selection = (self.data('l') == deg)
 
@@ -216,7 +220,9 @@ class GyreData:
 
         return periods
 
-    def delta_p(self, deg: int, use_seconds: bool = True,
+    def delta_p(self,
+                deg: int,
+                use_seconds: bool = True,
                 reduced: bool = False) -> np.ndarray:
         """Calculates period spacing sequence for g-modes.
 
