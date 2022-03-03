@@ -71,8 +71,6 @@ def plot_hr_logg_teff(targets: list[Star],
     col_nr = column.split('_')[-1]
     plt.text(label_x, label_y,
              f'{star_name}\n'
-             fr'$\chi^2$'
-             f', set {col_nr}'
              )
 
     if x_lim:
@@ -142,7 +140,7 @@ def save_best_info(star_name: str,
             f'{"T_eff":>5}',
             f'{"log_L":>5}',
             f'{"log_g":>5}',
-            f'{"age":>5}',
+            f'{"age":>6}',
             f'{"m_sdb":>6}',
             f'{"r_sdb":>6}',
             '\n',
@@ -164,7 +162,7 @@ def save_best_info(star_name: str,
                 f'{10 ** model.log_Teff:>5.0f}',
                 f'{model.log_L:>5.3f}',
                 f'{model.log_g:>5.3f}',
-                f'{model.age / 1e9:>5.3f}',
+                f'{model.age / 1e9:>6.3f}',
                 f'{model.m:>6.4f}',
                 f'{model.radius:>6.4f}',
                 '\n'
@@ -175,7 +173,7 @@ def save_best_info(star_name: str,
 def plot_modes(star: Star,
                df: DataFrame,
                grid: SdbGrid,
-               grid_dest_dir: str,
+               grid_dest_dir: Path,
                column: str,
                out_folder: Path,
                number_of_models: int,

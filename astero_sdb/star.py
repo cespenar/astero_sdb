@@ -209,19 +209,25 @@ class Star:
         for id in id_multiplets:
             df_multi = self.frequencies[self.frequencies['idm'] == id]
             deg = df_multi['l'][0]
-            if 0 in df_multi['m']:
-                i = df_multi['m'].tolist().index(0)
-                periods[df_multi['id'][i]] = {'P': df_multi['P'][i],
-                                              'l': deg}
+            if 'm' in self.frequencies.dtype.names:
+                if 0 in df_multi['m']:
+                    i = df_multi['m'].tolist().index(0)
+                    periods[df_multi['id'][i]] = {'P': df_multi['P'][i],
+                                                  'l': deg}
+                else:
+                    for m in np.sort(np.unique(np.abs(df_multi['m']))):
+                        if -m in df_multi['m'] and m in df_multi['m']:
+                            im = df_multi['m'].tolist().index(-m)
+                            ip = df_multi['m'].tolist().index(m)
+                            p_middle = round(
+                                (df_multi['P'][im] + df_multi['P'][ip]) / 2.0,
+                                5)
+                            periods[df_multi['id'][im]] = {'P': p_middle,
+                                                           'l': deg}
+                            break
             else:
-                for m in np.sort(np.unique(np.abs(df_multi['m']))):
-                    if -m in df_multi['m'] and m in df_multi['m']:
-                        im = df_multi['m'].tolist().index(-m)
-                        ip = df_multi['m'].tolist().index(m)
-                        p_middle = round(
-                            (df_multi['P'][im] + df_multi['P'][ip]) / 2.0, 5)
-                        periods[df_multi['id'][im]] = {'P': p_middle, 'l': deg}
-                        break
+                periods[df_multi['id'][0]] = {'P': df_multi['P'][0],
+                                              'l': deg}
         return [periods]
 
     def chi2_star(self,
