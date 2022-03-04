@@ -209,7 +209,8 @@ class Star:
         for id in id_multiplets:
             df_multi = self.frequencies[self.frequencies['idm'] == id]
             deg = df_multi['l'][0]
-            if 'm' in self.frequencies.dtype.names:
+            if 'm' in self.frequencies.dtype.names and not np.isnan(
+                    self.frequencies['m']).all():
                 if 0 in df_multi['m']:
                     i = df_multi['m'].tolist().index(0)
                     periods[df_multi['id'][i]] = {'P': df_multi['P'][i],
