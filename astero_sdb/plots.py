@@ -22,6 +22,7 @@ def plot_hr_logg_teff(targets: list[Star],
                       sigma_range: int = 3,
                       threshold_chi2: float = None,
                       threshold_chi2_mp: float = None,
+                      print_name: bool = True,
                       label_x: float = None,
                       label_y: float = None,
                       x_lim: tuple = None,
@@ -63,15 +64,16 @@ def plot_hr_logg_teff(targets: list[Star],
 
     for target, style, color in zip(targets, styles_observed,
                                     error_bar_colors):
-        _plot_target_logg_teff(target=target, style=style, error_color=color,
-                               marker_size=2.0, plot_error=False)
-        for sigma in range(1, sigma_range + 1):
-            _plot_error_box_logg_teff(star=target, color=color, sigma=sigma)
+        if target.t_eff and target.log_g:
+            _plot_target_logg_teff(target=target, style=style,
+                                   error_color=color, marker_size=2.0,
+                                   plot_error=False)
+            for sigma in range(1, sigma_range + 1):
+                _plot_error_box_logg_teff(star=target, color=color,
+                                          sigma=sigma)
 
-    col_nr = column.split('_')[-1]
-    plt.text(label_x, label_y,
-             f'{star_name}\n'
-             )
+    if print_name:
+        plt.text(label_x, label_y, f'{star_name}\n')
 
     if x_lim:
         plt.xlim(x_lim)
