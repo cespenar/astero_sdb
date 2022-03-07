@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 from matplotlib.patches import Rectangle
 from pandas.core.frame import DataFrame, Series
 
@@ -184,8 +185,8 @@ def plot_modes(star: Star,
     for _, model in df.sort_values(f'{column}').head(
             number_of_models).iterrows():
         puls_data = grid.read_puls_model(
-            log_dir=model.log_dir,
-            top_dir=model.top_dir,
+            log_dir=Path(model.log_dir),
+            top_dir=Path(model.top_dir),
             he4=model.he4,
             dest_dir=grid_dest_dir,
             delete_file=False,
@@ -214,27 +215,48 @@ def _plot_modes_single_model(star: Star,
                              star_name: str,
                              plot_legend: bool = False,
                              legend_loc: str = None) -> None:
-    w, h = plt.figaspect(0.3)
-    plt.figure(figsize=(w, h))
-    plt.xlabel(r'$P\/\mathrm{{[s]}}$')
-    plt.ylabel('')
+    periods = star.periods_explicit()[0]
+    degrees = np.sort(np.unique([p['l'] for p in periods.values()]))
 
-    plt.vlines(x=puls_data.periods(deg=1, g_modes_only=True),
-               ymin=0, ymax=1, colors='black', linewidth=2)
-    plt.vlines(x=star.frequencies['P'], ymin=0, ymax=1, colors='red',
-               linestyles='dotted', linewidth=4)
+    colors = ['red', 'green', 'blue', 'magenta']
 
-    plt.text(200, 1.05,
-             f'{star_name}'
-             fr'$,\/\chi^2={model[f"{col}"]:.2f},\/$'
-             fr'$\mathrm{{id}}={model.id},\/Z_\mathrm{{i}}={model.z_i:.3f},\/$'
-             fr'$Y_\mathrm{{i}}={model.y_i:.4f},\/M_\mathrm{{i}}={model.m_i:.2f}\,M_\odot,\/$'
-             fr'$M_\mathrm{{env}}={model.m_env:.4f}\,M_\odot,\/Y_\mathrm{{c}}={model.he4:.2f},\/$'
-             fr'$T_\mathrm{{eff}}={10 ** model.log_Teff:.0f}\,\mathrm{{K}},\/\log\,g={model.log_g:.3f}$'
-             )
+    w, h = plt.figaspect(0.3 * len(degrees))
+    fig = plt.figure(figsize=(w, h))
+    gs = fig.add_gridspec(len(degrees), hspace=0)
+    axs = gs.subplots(sharex=True, squeeze=False)
+
+    for i, deg in enumerate(degrees):
+        periods_deg = [p['P'] for p in periods.values() if p['l'] == deg]
+        if deg == degrees[-1]:
+            axs[i, 0].set_xlabel(r'$P\/\mathrm{{[s]}}$')
+        axs[i, 0].set_ylabel(fr'$\ell={int(deg)}$')
+
+        axs[i, 0].set_ylim(0.0, 1.0)
+
+        axs[i, 0].tick_params(axis='y',
+                              which='both',
+                              left=False,
+                              right=False,
+                              labelleft=False,
+                              labelright=False)
+
+        axs[i, 0].vlines(x=puls_data.periods(deg=deg, g_modes_only=True),
+                         ymin=0, ymax=1, colors='black', linewidth=1)
+        axs[i, 0].vlines(x=periods_deg, ymin=0, ymax=1, colors=colors[i],
+                         linestyles='dotted', linewidth=4)
+
+        if i == 0:
+            axs[i, 0].text(x_lim[0] + int(0.02 * (x_lim[1] - x_lim[0])), 1.1,
+                           f'{star_name}'
+                           fr'$,\/\chi^2={model[f"{col}"]:.2f},\/$'
+                           fr'$\mathrm{{id}}={model.id},\/Z_\mathrm{{i}}={model.z_i:.3f},\/$'
+                           fr'$Y_\mathrm{{i}}={model.y_i:.4f},\/M_\mathrm{{i}}={model.m_i:.2f}\,M_\odot,\/$'
+                           '\n'
+                           fr'$M_\mathrm{{env}}={model.m_env:.4f}\,M_\odot,\/Y_\mathrm{{c}}={model.he4:.2f},\/$'
+                           fr'$T_\mathrm{{eff}}={10 ** model.log_Teff:.0f}\,\mathrm{{K}},\/\log\,g={model.log_g:.3f}$'
+                           )
 
     plt.xlim(x_lim)
-    plt.ylim(-0.02, 1.15)
 
     if plot_legend and legend_loc:
         plt.legend(loc=legend_loc)
