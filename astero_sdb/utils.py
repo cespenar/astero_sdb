@@ -2,7 +2,7 @@ import numpy as np
 from mesa_reader import MesaData
 
 
-def zaehb_index(history_data: MesaData) -> int:
+def find_zaehb_index(history_data: MesaData) -> int:
     """Finds index of the ZAEHB model.
 
     Parameters
@@ -21,7 +21,7 @@ def zaehb_index(history_data: MesaData) -> int:
 
 
 def zaehb_age(history_data: MesaData,
-              zaehb_index: int) -> float:
+              zaehb_index: int = None) -> float:
     """Finds age of the ZAEHB model calculated from the beginning of the PMS
     evolution.
 
@@ -29,6 +29,8 @@ def zaehb_age(history_data: MesaData,
     ----------
     history_data : mesa_reader.MesaData
         Evolutionary track (MESA history file) as MesaData object.
+    zaehb_index : int, optional
+        Index of the ZAEHB model.
 
     Returns
     ----------
@@ -37,11 +39,12 @@ def zaehb_age(history_data: MesaData,
 
     """
 
+    if not zaehb_index:
+        zaehb_index = find_zaehb_index(history_data)
     return history_data.star_age[zaehb_index]
 
 
-def find_semiconvection_bottom(profile: MesaData,
-                               verbose: bool = False) -> int:
+def find_semiconvection_bottom(profile: MesaData) -> int:
     """Finds the zone where the natural semiconvection starts in a MESA model.
 
     Parameters
@@ -68,21 +71,18 @@ def find_semiconvection_bottom(profile: MesaData,
         if delta_nabla[i - 1] * delta <= 0.0:
             zone_semi_bottom = profile.zone[::-1][i - 1]
             break
-    if verbose:
-        print('zone_semi_bottom =', zone_semi_bottom)
     return zone_semi_bottom
 
 
 def find_semiconvection_top(profile: MesaData,
-                            zone_semi_bottom: int,
-                            verbose: bool = False) -> int:
+                            zone_semi_bottom: int = None) -> int:
     """Finds the zone where the natural semiconvection ends in a MESA model.
 
     Parameters
     ----------
     profile : mesa_reader.MesaData
         Evolutionary model (MESA profile file) as MesaData object.
-    zone_semi_bottom : int
+    zone_semi_bottom : int, optional
         The zone where the natural semiconvection starts.
 
     Returns
@@ -92,6 +92,8 @@ def find_semiconvection_top(profile: MesaData,
 
     """
 
+    if not zone_semi_bottom:
+        zone_semi_bottom = find_semiconvection_bottom(profile)
     ind_q08 = np.where(profile.q >= 0.8)[0][-1]
     zone_semi_top = np.argmax(
         profile.gradL[ind_q08:zone_semi_bottom - 1]) + ind_q08
@@ -112,6 +114,49 @@ def find_semiconvection_top(profile: MesaData,
         elif in_conv and delta <= 0:
             zone_semi_top = zone_semi_top + i - 1
             break
-    if verbose:
-        print('zone_semi_top =', zone_semi_top)
     return zone_semi_top
+
+
+def mass_total_core(profile: MesaData,
+                    zone_semi_top: int = None) -> float:
+    """Mass of the core treated as a sum of convective and semicovective
+    regions.
+
+    Parameters
+    ----------
+    profile : mesa_reader.MesaData
+        Evolutionary model (MESA profile file) as MesaData object.
+    zone_semi_top : int, optional
+        The zone where the natural semiconvection end.
+
+    Returns
+    ----------
+    float
+        Mass of the convective core.
+
+    """
+
+    if not zone_semi_top:
+        zone_semi_top = find_semiconvection_top(profile)
+    return profile.mass[zone_semi_top - 1]
+
+
+def mass_conv_core_history(history: MesaData,
+                           model_nr: int) -> float:
+    """Mass of the convective core of selected model.
+
+    Parameters
+    ----------
+    history : mesa_reader.MesaData
+        Evolutionary track (MESA history file) as MesaData object.
+    model_nr : int
+        Number of model along the evolutionary track.
+
+    Returns
+    ----------
+    float
+        Mass of the convective core.
+
+    """
+
+    return history.mass_conv_core[model_nr - 1]
