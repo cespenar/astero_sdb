@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Union
 
 import numpy as np
 
@@ -50,7 +51,7 @@ class GyreData:
     def set_body_names_line(cls, name_line: int = 6) -> None:
         cls.bulk_names_line = name_line
 
-    def __init__(self, file_name: Path):
+    def __init__(self, file_name: Union[Path, str]):
         """Make a GyreData object from a GYRE output file.
 
         Assumes the following structure of a file:
@@ -72,7 +73,8 @@ class GyreData:
             The name of GYRE output file to be read in.
         """
 
-        self.file_name = file_name
+        self.file_name = file_name if isinstance(file_name, Path) else Path(
+            file_name)
         self.header_names = None
         self.header_data = None
         self.body_names = None
