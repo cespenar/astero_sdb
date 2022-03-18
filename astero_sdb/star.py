@@ -290,6 +290,8 @@ class Star:
                   grid: SdbGrid,
                   dest_dir: Path,
                   ignore_combinations: bool = True,
+                  ignore_degree: bool = False,
+                  max_deg_if_ignore: int = 2,
                   save_period_list: bool = False,
                   period_list_name: str = None,
                   progress: bool = True) -> None:
@@ -308,6 +310,12 @@ class Star:
         ignore_combinations : bool, optional
             If True ignores potential combinations of periods due to missing
             components of multiplets. Default: True.
+        ignore_degree : bool, optional
+            If True ignore mode identification during chi^2 minimization.
+            Default: False.
+        max_deg_if_ignore : int, optianal
+            Maximum degree used for minimizing chi^2 if ignore_degree is True.
+            Default: 2.
         save_period_list : bool, optional
             If True creates a file with listed all combinations of periods used
             to calculate chi^2 function.
@@ -355,12 +363,24 @@ class Star:
                                              dest_dir=dest_dir,
                                              delete_file=False,
                                              keep_tree=True)
+            if ignore_degree:
+                combined_periods = puls_data.periods(deg=1, g_modes_only=True)
+                if max_deg_if_ignore > 1:
+                    for d in range(2, max_deg_if_ignore + 1):
+                        combined_periods = np.concatenate((combined_periods,
+                                                           puls_data.periods(
+                                                               deg=d,
+                                                               g_modes_only=True)))
+                combined_periods = np.sort(combined_periods)[::-1]
             for i, periods in enumerate(period_combinations):
                 chi2 = 0.0
                 for p_obs in periods.values():
-                    delta = np.min(np.abs(puls_data.periods(
-                        p_obs['l'], g_modes_only=True) - p_obs['P']))
-                    chi2 += delta ** 2.0
+                    if ignore_degree:
+                        delta = np.min(np.abs(combined_periods - p_obs['P']))
+                    else:
+                        delta = np.min(np.abs(puls_data.periods(
+                            p_obs['l'], g_modes_only=True) - p_obs['P']))
+                chi2 += delta ** 2.0
                 chi2 /= len(periods)
                 df_selected[f'chi2_puls_{i + 1}'][index] = chi2
             if progress:
@@ -376,6 +396,8 @@ class Star:
                       use_spectroscopy: bool = True,
                       use_periods: bool = True,
                       ignore_combinations: bool = True,
+                      ignore_degree: bool = False,
+                      max_deg_if_ignore: int = 2,
                       save_period_list: bool = False,
                       period_list_name: str = None,
                       progress: bool = True,
@@ -402,6 +424,12 @@ class Star:
         ignore_combinations : bool, optional
             If True ignores potential combinations of periods due to missing
             components of multiplets. Default: True.
+        ignore_degree : bool, optional
+            If True ignore mode identification during chi^2 minimization using
+            available pulsational periods. Default: False.
+        max_deg_if_ignore : int, optional
+            Maximum degree used for minimizing chi^2 if ignore_degree is True.
+            Default: 2.
         save_period_list : bool, optional
             If True creates a file with listed all combinations of periods used
             to calculate chi^2 function.
@@ -432,6 +460,8 @@ class Star:
                            grid=grid,
                            dest_dir=dest_dir,
                            ignore_combinations=ignore_combinations,
+                           ignore_degree=ignore_degree,
+                           max_deg_if_ignore=max_deg_if_ignore,
                            save_period_list=save_period_list,
                            period_list_name=period_list_name,
                            progress=progress)
