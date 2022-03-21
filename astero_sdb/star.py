@@ -347,8 +347,11 @@ class Star:
                 for i, p_dict in enumerate(period_combinations):
                     f.write(f'--- puls_{i + 1} ---\n')
                     for id, p in p_dict.items():
-                        f.write(
-                            f'ID: {id:4}, P: {p["P"]:12}, l: {int(p["l"]):1}\n')
+                        try:
+                            f.write(f'ID: {id:4}, '
+                                    f'P: {p["P"]:12}, l: {int(p["l"]):1}\n')
+                        except ValueError:
+                            f.write(f'ID: {id:4}, P: {p["P"]:12}, l: NaN\n')
                     f.write('\n')
 
         for i in range(len(period_combinations)):
