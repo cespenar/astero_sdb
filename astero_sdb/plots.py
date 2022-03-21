@@ -184,9 +184,15 @@ def plot_modes(star: Star,
                grid_dest_dir: Path,
                column: str,
                out_folder: Path,
-               number_of_models: int,
+               number_of_models: int = 50,
+               threshold_chi2_mp: float = None,
                x_lim: tuple = (0, 10000.0),
                star_name: str = None) -> None:
+    chi2_min = df[f'{column}'].min()
+    if threshold_chi2_mp:
+        number_of_models = len(
+            df[df[f'{column}'] <= threshold_chi2_mp * chi2_min])
+
     for _, model in df.sort_values(f'{column}').head(
             number_of_models).iterrows():
         puls_data = grid.read_puls_model(
