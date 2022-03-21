@@ -19,7 +19,7 @@ def plot_hr_logg_teff(targets: list[Star],
                       df: DataFrame,
                       column: str,
                       out_folder: Path,
-                      number_of_models: int,
+                      number_of_models: int = 50,
                       sigma_range: int = 3,
                       threshold_chi2: float = None,
                       threshold_chi2_mp: float = None,
@@ -38,6 +38,10 @@ def plot_hr_logg_teff(targets: list[Star],
     error_bar_colors = ['magenta', 'green', ]
 
     chi2_min = df[f'{column}'].min()
+
+    if threshold_chi2_mp:
+        number_of_models = len(
+            df[df[f'{column}'] <= threshold_chi2_mp * chi2_min])
 
     plt.scatter(10.0 ** df.sort_values(f'{column}').log_Teff[
                         number_of_models:] / 1000.0,
@@ -120,7 +124,7 @@ def save_best_info(star_name: str,
                    df: DataFrame,
                    column: str,
                    out_folder: Path,
-                   number_of_models: int,
+                   number_of_models: int = 50,
                    threshold_chi2: float = None,
                    threshold_chi2_mp: float = None) -> None:
     chi2_min = df[f'{column}'].min()
@@ -129,6 +133,7 @@ def save_best_info(star_name: str,
         df = df[df[f'{column}'] <= threshold_chi2]
     if threshold_chi2_mp:
         df = df[df[f'{column}'] <= threshold_chi2_mp * chi2_min]
+        number_of_models = len(df)
 
     output = out_folder.joinpath(f'{star_name}-best-{column}.txt')
     with output.open(mode='w') as f:
