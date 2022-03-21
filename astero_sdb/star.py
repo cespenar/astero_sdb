@@ -383,7 +383,7 @@ class Star:
                     else:
                         delta = np.min(np.abs(puls_data.periods(
                             p_obs['l'], g_modes_only=True) - p_obs['P']))
-                chi2 += delta ** 2.0
+                    chi2 += delta ** 2.0
                 chi2 /= len(periods)
                 df_selected[f'chi2_puls_{i + 1}'][index] = chi2
             if progress:
