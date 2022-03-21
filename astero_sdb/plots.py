@@ -28,6 +28,7 @@ def plot_hr_logg_teff(targets: list[Star],
                       label_y: float = None,
                       x_lim: tuple = None,
                       y_lim: tuple = None) -> None:
+
     plt.figure()
     plt.gca().invert_xaxis()
     plt.gca().invert_yaxis()
@@ -97,6 +98,7 @@ def _plot_target_logg_teff(target: Star,
                            error_color: str,
                            marker_size: float = 5,
                            plot_error: bool = False) -> None:
+
     plt.plot(target.t_eff / 1000.0, target.log_g,
              style, ms=marker_size, label=target.name)
     if plot_error:
@@ -109,6 +111,7 @@ def _plot_target_logg_teff(target: Star,
 def _plot_error_box_logg_teff(star: Star,
                               color: str,
                               sigma: int = 1) -> None:
+
     box = Rectangle(((star.t_eff - sigma * star.t_eff_err_m) / 1000.0,
                      star.log_g - sigma * star.log_g_err_m),
                     sigma * (star.t_eff_err_p + star.t_eff_err_m) / 1000.0,
@@ -127,6 +130,7 @@ def save_best_info(star_name: str,
                    number_of_models: int = 50,
                    threshold_chi2: float = None,
                    threshold_chi2_mp: float = None) -> None:
+
     chi2_min = df[f'{column}'].min()
 
     if threshold_chi2:
@@ -188,6 +192,7 @@ def plot_modes(star: Star,
                threshold_chi2_mp: float = None,
                x_lim: tuple = (0, 10000.0),
                star_name: str = None) -> None:
+
     chi2_min = df[f'{column}'].min()
     if threshold_chi2_mp:
         number_of_models = len(

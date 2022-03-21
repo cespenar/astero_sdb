@@ -546,6 +546,37 @@ class Star:
 
         return grid.data[c]
 
+    def periods_range(self,
+                      round_for_axes_range: bool = False,
+                      divisor: float = 500.0) -> tuple[float, float]:
+        """Returns min and max periods.
+
+        Parameters
+        ----------
+        round_for_axes_range : bool, optional
+            If True rounds the returned values for multiplies of divisor. This
+            is useful for providing range for plots. Default: False.
+        divisor : float, optional
+            Divisor used to determine to what number the returned values are
+            rounded when round_for_axes_range is True. Default: 500.0
+
+        Returns
+        -------
+        tuple[float, float]
+            Min and max periods.
+        """
+
+        if round_for_axes_range:
+            p_min = self.frequencies['P'].min() \
+                    - self.frequencies['P'].min() % divisor
+            p_max = self.frequencies['P'].max() + divisor \
+                    - self.frequencies['P'].max() % divisor
+        else:
+            p_min = self.frequencies['P'].min()
+            p_max = self.frequencies['P'].max()
+
+        return p_min, p_max
+
     @staticmethod
     def calc_feh(z: float) -> float:
         """Calculates [Fe/H] from metallicity.
