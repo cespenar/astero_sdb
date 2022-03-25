@@ -27,7 +27,9 @@ def plot_hr_logg_teff(targets: list[Star],
                       label_x: float = None,
                       label_y: float = None,
                       x_lim: tuple = None,
-                      y_lim: tuple = None) -> None:
+                      y_lim: tuple = None,
+                      save_pdf: bool = True,
+                      save_eps: bool = False) -> None:
     plt.figure()
     plt.gca().invert_xaxis()
     plt.gca().invert_yaxis()
@@ -88,7 +90,12 @@ def plot_hr_logg_teff(targets: list[Star],
     plt.legend(loc='upper left')
 
     output = out_folder.joinpath(f'{star_name}_logg-Teff-best_{column}')
-    plt.savefig(output.with_suffix('.pdf'), format='pdf', bbox_inches='tight')
+    if save_pdf:
+        plt.savefig(output.with_suffix('.pdf'), format='pdf',
+                    bbox_inches='tight')
+    if save_eps:
+        plt.savefig(output.with_suffix('.eps'), format='eps',
+                    bbox_inches='tight')
     plt.close()
 
 
@@ -187,7 +194,9 @@ def plot_modes(star: Star,
                number_of_models: int = 50,
                threshold_chi2_mp: float = None,
                x_lim: tuple = (0, 10000.0),
-               star_name: str = None) -> None:
+               star_name: str = None,
+               save_pdf: bool = True,
+               save_eps: bool = False) -> None:
     chi2_min = df[f'{column}'].min()
     if threshold_chi2_mp:
         number_of_models = len(
@@ -214,7 +223,9 @@ def plot_modes(star: Star,
                                  col=column,
                                  output=output,
                                  x_lim=x_lim,
-                                 star_name=star_name)
+                                 star_name=star_name,
+                                 save_pdf=save_pdf,
+                                 save_eps=save_eps)
 
 
 def _plot_modes_single_model(star: Star,
@@ -225,7 +236,9 @@ def _plot_modes_single_model(star: Star,
                              x_lim: tuple,
                              star_name: str,
                              plot_legend: bool = False,
-                             legend_loc: str = None) -> None:
+                             legend_loc: str = None,
+                             save_pdf: bool = True,
+                             save_eps: bool = False) -> None:
     periods = star.periods_explicit()[0]
     degrees = np.sort(np.unique([p['l'] for p in periods.values()]))
 
@@ -272,6 +285,10 @@ def _plot_modes_single_model(star: Star,
     if plot_legend and legend_loc:
         plt.legend(loc=legend_loc)
 
-    plt.savefig(output.with_suffix(output.suffix + '.pdf'), format='pdf',
-                bbox_inches='tight')
+    if save_pdf:
+        plt.savefig(output.with_suffix(output.suffix + '.pdf'), format='pdf',
+                    bbox_inches='tight')
+    if save_eps:
+        plt.savefig(output.with_suffix(output.suffix + '.eps'), format='eps',
+                    bbox_inches='tight')
     plt.close()
