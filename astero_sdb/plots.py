@@ -133,7 +133,7 @@ def save_best_info(star_name: str,
                    column: str,
                    out_folder: Path,
                    grid: SdbGrid,
-                   number_of_models: int = 50,
+                   number_of_models: int = None,
                    threshold_chi2: float = None,
                    threshold_chi2_mp: float = None,
                    calculate_age_sdb: bool = False,
@@ -142,9 +142,12 @@ def save_best_info(star_name: str,
 
     if threshold_chi2:
         df = df[df[f'{column}'] <= threshold_chi2]
+        if not number_of_models:
+            number_of_models = 50
     if threshold_chi2_mp:
         df = df[df[f'{column}'] <= threshold_chi2_mp * chi2_min]
-        number_of_models = len(df)
+        if not number_of_models:
+            number_of_models = len(df)
 
     output = out_folder.joinpath(f'{star_name}-best-{column}.txt')
     with output.open(mode='w') as f:
