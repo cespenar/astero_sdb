@@ -8,6 +8,7 @@ from pandas.core.frame import DataFrame, Series
 from .gyre_reader import GyreData
 from .sdb_grid_reader import SdbGrid
 from .star import Star
+from .utils import mass_total_core, mass_conv_core_history, zaehb_age
 
 plt.rcParams['legend.frameon'] = False
 plt.rcParams['legend.labelspacing'] = 0.1
@@ -131,9 +132,12 @@ def save_best_info(star_name: str,
                    df: DataFrame,
                    column: str,
                    out_folder: Path,
+                   grid: SdbGrid,
                    number_of_models: int = 50,
                    threshold_chi2: float = None,
-                   threshold_chi2_mp: float = None) -> None:
+                   threshold_chi2_mp: float = None,
+                   calculate_age_sdb: bool = False,
+                   calculate_m_core: bool = False) -> None:
     chi2_min = df[f'{column}'].min()
 
     if threshold_chi2:
@@ -158,14 +162,38 @@ def save_best_info(star_name: str,
             f'{"age":>6}',
             f'{"m_sdb":>6}',
             f'{"r_sdb":>6}',
+            f'{"age_sdb":>8}',
+            f'{"m_cc":>6}',
+            f'{"m_tc":>6}',
             '\n',
         ])
         f.write(header)
 
         for _, model in df[['id', f'{column}', 'z_i', 'm_i', 'm_env', 'y_i',
                             'he4', 'log_Teff', 'log_L', 'log_g', 'age', 'm',
-                            'radius']].sort_values(f'{column}').head(
+                            'radius', 'model_number', 'top_dir',
+                            'log_dir']].sort_values(f'{column}').head(
             number_of_models).iterrows():
+            if calculate_age_sdb:
+                history = grid.read_history(log_dir=model.log_dir,
+                                            top_dir=model.top_dir)
+                age_sdb = (model.age - zaehb_age(history_data=history)) / 1e6
+            else:
+                age_sdb = -1.0
+
+            if calculate_m_core:
+                history = grid.read_history(log_dir=model.log_dir,
+                                            top_dir=model.top_dir)
+                profile = grid.read_evol_model(log_dir=model.log_dir,
+                                               top_dir=model.top_dir,
+                                               he4=round(model.he4, 2))
+                m_cc = mass_conv_core_history(history=history,
+                                              model_nr=model.model_number)
+                m_tc = mass_total_core(profile=profile)
+            else:
+                m_cc = -1.0
+                m_tc = -1.0
+
             row = ' '.join([
                 f'{model.id:>6.0f}',
                 f'{model[f"{column}"]:>9.2f}',
@@ -180,6 +208,9 @@ def save_best_info(star_name: str,
                 f'{model.age / 1e9:>6.3f}',
                 f'{model.m:>6.4f}',
                 f'{model.radius:>6.4f}',
+                f'{age_sdb:>8.3f}',
+                f'{m_cc:>6.4f}',
+                f'{m_tc:>6.4f}',
                 '\n'
             ])
             f.write(row)
