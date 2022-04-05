@@ -179,7 +179,10 @@ def save_best_info(star_name: str,
             number_of_models).iterrows():
             if calculate_age_sdb:
                 history = grid.read_history(log_dir=model.log_dir,
-                                            top_dir=model.top_dir)
+                                            top_dir=model.top_dir,
+                                            dest_dir=grid.grid_dir,
+                                            delete_file=False,
+                                            keep_tree=True)
                 age_sdb = (model.age - zaehb_age(history_data=history)) / 1e6
                 if age_sdb < 0:
                     age_sdb = -1.0
