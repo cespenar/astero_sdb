@@ -178,6 +178,8 @@ def save_best_info(star_name: str,
                 history = grid.read_history(log_dir=model.log_dir,
                                             top_dir=model.top_dir)
                 age_sdb = (model.age - zaehb_age(history_data=history)) / 1e6
+                if age_sdb < 0:
+                    age_sdb = -1.0
             else:
                 age_sdb = -1.0
 
@@ -208,7 +210,7 @@ def save_best_info(star_name: str,
                 f'{model.age / 1e9:>6.3f}',
                 f'{model.m:>6.4f}',
                 f'{model.radius:>6.4f}',
-                f'{age_sdb:>8.3f}',
+                f'{age_sdb:>8.2f}',
                 f'{m_cc:>6.4f}',
                 f'{m_tc:>6.4f}',
                 '\n'
