@@ -286,7 +286,7 @@ class SdbGrid:
         with ZipFile(grid_zip_file) as archive:
             if str(grid_zip_path) in archive.namelist():
                 if keep_tree:
-                    archive.exftract(grid_zip_path, dest_dir)
+                    archive.extract(grid_zip_path, dest_dir)
                 else:
                     with archive.open(grid_zip_path) as zipped_file, open(
                             dest_path, 'wb') as dest_file:
