@@ -1,6 +1,7 @@
 import shutil
 from pathlib import Path
 from zipfile import ZipFile
+import os
 
 import mesa_reader as mesa
 import pandas as pd
@@ -65,8 +66,8 @@ class SdbGrid:
         return f'SdbGrid(db_file={self.db_file}, grid_dir={self.grid_dir})'
 
     def read_history(self,
-                     log_dir: Path,
-                     top_dir: Path,
+                     log_dir: str,
+                     top_dir: str,
                      dest_dir: Path = Path('.'),
                      delete_file: bool = True,
                      rename: bool = False,
@@ -75,9 +76,9 @@ class SdbGrid:
 
         Parameters
         ----------
-        log_dir : Path
+        log_dir : str
             Log directory.
-        top_dir : Path
+        top_dir : str
             Top directory.
         dest_dir : Path, optional
             Temporary directory for the required track. Default: Path('.').
@@ -114,8 +115,8 @@ class SdbGrid:
         return data
 
     def read_evol_model(self,
-                        log_dir: Path,
-                        top_dir: Path,
+                        log_dir: str,
+                        top_dir: str,
                         he4: float,
                         dest_dir: Path = Path('.'),
                         delete_file: bool = True,
@@ -125,9 +126,9 @@ class SdbGrid:
 
         Parameters
         ----------
-        log_dir : Path
+        log_dir : str
             Log directory.
-        top_dir : Path
+        top_dir : str
             Top directory.
         he4 : float
             Central helium abundance of the required model.
@@ -160,8 +161,8 @@ class SdbGrid:
         return data
 
     def read_puls_model(self,
-                        log_dir: Path,
-                        top_dir: Path,
+                        log_dir: str,
+                        top_dir: str,
                         he4: float,
                         dest_dir: Path = Path('.'),
                         delete_file: bool = True,
@@ -170,9 +171,9 @@ class SdbGrid:
 
         Parameters
         ----------
-        log_dir : Path
+        log_dir : str
             Log directory.
-        top_dir : Path
+        top_dir : str
             Top directory.
         he4 : float
             Central helium abundance of the required model.
@@ -205,8 +206,8 @@ class SdbGrid:
         return data
 
     def extract_history(self,
-                        log_dir: Path,
-                        top_dir: Path,
+                        log_dir: str,
+                        top_dir: str,
                         dest_dir: Path,
                         rename: bool = False,
                         keep_tree: bool = False) -> None:
@@ -214,9 +215,9 @@ class SdbGrid:
 
         Parameters
         ----------
-        log_dir : Path
+        log_dir : str
             Log directory.
-        top_dir : Path
+        top_dir : str
             Top directory.
         dest_dir : Path
             Destination directory for the extracted model if 'keep_tree' is
@@ -238,7 +239,7 @@ class SdbGrid:
             history_name = f'history{log_dir[4:]}.data'
         else:
             history_name = 'history.data'
-        grid_zip_path = top_dir.joinpath(log_dir, history_name)
+        grid_zip_path = os.path.join(top_dir, log_dir, history_name)
         dest_path = dest_dir.joinpath(history_name)
 
         with ZipFile(grid_zip_file) as archive:
@@ -250,8 +251,8 @@ class SdbGrid:
                     shutil.copyfileobj(zipped_file, dest_file)
 
     def extract_evol_model(self,
-                           log_dir: Path,
-                           top_dir: Path,
+                           log_dir: str,
+                           top_dir: str,
                            he4: float,
                            dest_dir: Path,
                            keep_tree: bool = False) -> None:
@@ -259,9 +260,9 @@ class SdbGrid:
 
         Parameters
         ----------
-        log_dir : Path
+        log_dir : str
             Log directory.
-        top_dir : Path
+        top_dir : str
             Top directory.
         he4 : float
             Central helium abundance of the required model.
@@ -279,7 +280,7 @@ class SdbGrid:
 
         grid_zip_file = self.grid_dir.joinpath(self.archive_name(top_dir))
         model_name = self.evol_model_name(he4)
-        grid_zip_path = top_dir.joinpath(log_dir, model_name)
+        grid_zip_path = os.path.join(top_dir, log_dir, model_name)
         dest_path = dest_dir.joinpath(model_name)
 
         with ZipFile(grid_zip_file) as archive:
@@ -292,8 +293,8 @@ class SdbGrid:
                         shutil.copyfileobj(zipped_file, dest_file)
 
     def extract_puls_model(self,
-                           log_dir: Path,
-                           top_dir: Path,
+                           log_dir: str,
+                           top_dir: str,
                            he4: float,
                            dest_dir: Path,
                            keep_tree: bool = False) -> None:
@@ -301,9 +302,9 @@ class SdbGrid:
 
         Parameters
         ----------
-        log_dir : Path
+        log_dir : str
             Log directory.
-        top_dir : Path
+        top_dir : str
             Top directory.
         he4 : float
             Central helium abundance of the required model.
@@ -321,7 +322,7 @@ class SdbGrid:
 
         grid_zip_file = self.grid_dir.joinpath(self.archive_name(top_dir))
         model_name = self.puls_model_name(he4)
-        grid_zip_path = top_dir.joinpath(log_dir, model_name)
+        grid_zip_path = os.path.join(top_dir, log_dir, model_name)
         dest_path = dest_dir.joinpath(model_name)
 
         with ZipFile(grid_zip_file) as archive:
@@ -516,7 +517,7 @@ class SdbGrid:
             return False
 
     @staticmethod
-    def archive_name(top_dir: Path) -> str:
+    def archive_name(top_dir: str) -> str:
         """Returns a name of a zip file containing a top directory.
 
         Parameters
@@ -530,7 +531,7 @@ class SdbGrid:
             Name of zipfile.
         """
 
-        return f'grid{str(top_dir)[4:]}.zip'
+        return f'grid{top_dir[4:]}.zip'
 
     @staticmethod
     def evol_model_name(he4: float) -> str:
