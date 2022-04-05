@@ -191,10 +191,16 @@ def save_best_info(star_name: str,
 
             if calculate_m_core:
                 history = grid.read_history(log_dir=model.log_dir,
-                                            top_dir=model.top_dir)
+                                            top_dir=model.top_dir,
+                                            dest_dir=grid.grid_dir,
+                                            delete_file=False,
+                                            keep_tree=True)
                 profile = grid.read_evol_model(log_dir=model.log_dir,
                                                top_dir=model.top_dir,
-                                               he4=round(model.he4, 2))
+                                               he4=round(model.he4, 2),
+                                               dest_dir=grid.grid_dir,
+                                               delete_file=False,
+                                               keep_tree=True)
                 m_cc = mass_conv_core_history(history=history,
                                               model_nr=model.model_number)
                 m_tc = mass_total_core(profile=profile)
