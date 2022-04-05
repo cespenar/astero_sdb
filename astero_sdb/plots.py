@@ -175,17 +175,17 @@ def save_best_info(star_name: str,
                             'log_dir']].sort_values(f'{column}').head(
             number_of_models).iterrows():
             if calculate_age_sdb:
-                history = grid.read_history(log_dir=model.log_dir,
-                                            top_dir=model.top_dir)
+                history = grid.read_history(log_dir=Path(model.log_dir),
+                                            top_dir=Path(model.top_dir))
                 age_sdb = (model.age - zaehb_age(history_data=history)) / 1e6
             else:
                 age_sdb = -1.0
 
             if calculate_m_core:
-                history = grid.read_history(log_dir=model.log_dir,
-                                            top_dir=model.top_dir)
-                profile = grid.read_evol_model(log_dir=model.log_dir,
-                                               top_dir=model.top_dir,
+                history = grid.read_history(log_dir=Path(model.log_dir),
+                                            top_dir=Path(model.top_dir))
+                profile = grid.read_evol_model(log_dir=Path(model.log_dir),
+                                               top_dir=Path(model.top_dir),
                                                he4=round(model.he4, 2))
                 m_cc = mass_conv_core_history(history=history,
                                               model_nr=model.model_number)
