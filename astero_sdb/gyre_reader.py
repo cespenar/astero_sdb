@@ -44,7 +44,7 @@ class GyreData:
     body_names_line = 6
 
     @classmethod
-    def set_header_names_line(cls, name_line: int = 2) -> None:
+    def set_header_names_line(cls, name_line: int = 3) -> None:
         cls.header_names_line = name_line
 
     @classmethod
@@ -81,7 +81,7 @@ class GyreData:
         self.body_data = None
         self.read_gyre()
 
-    def read_gyre(self):
+    def read_gyre(self) -> None:
         """Reads data from a GYRE output file.
 
         Parameters
@@ -123,6 +123,7 @@ class GyreData:
         bool
             True if 'key' is in header names, otherwise False.
         """
+
         return key in self.header_names
 
     def is_in_data(self, key: str) -> bool:
@@ -138,6 +139,7 @@ class GyreData:
         bool
             True if 'key' is a valid column name, otherwise False.
         """
+
         return key in self.body_names
 
     def header(self, key: str) -> np.ndarray:

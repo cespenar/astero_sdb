@@ -1,10 +1,11 @@
 # astero_sdb
-=================
 
+***
 Tools for asteroseismology of sdB stars using MESA and GYRE models.
 
 ## Installation
 
+***
 Install by cloning the repository, `cd` into it and then execute
 
     pip install .
@@ -13,12 +14,14 @@ to install the package on your system.
 
 ## Uninstallation
 
+***
 Uninstall by executing
 
     pip uninstall astero_sdb
 
 ## Basic usage
 
+***
 ### Read the grid of models:
 
 ```python
@@ -71,3 +74,9 @@ target.evaluate_chi2(df_selected=df,
                      period_list_name=f'{target.name}_periods.txt',
                      results_file_name=f'{target.name}_results.txt')
 ```
+
+## Acknowledgements
+
+***
+The author was financially supported by the Polish National Science Centre
+grant UMO-2017/26/E/ST9/00703.

@@ -12,6 +12,49 @@ from .sdb_grid_reader import SdbGrid
 class Star:
     """Structure containing observational properties of a star.
 
+    Parameters
+    ----------
+    name : str
+        Name of the star.
+    t_eff : float, optional
+        Effective temperature. Default: None.
+    t_eff_err_p : float, optional
+        Plus-error of effective temperature. Default: None.
+    t_eff_err_m : float, optional
+        Minus-error of effective temperature. Default: None.
+    log_g : float, optional
+        Surface log(g). Default: None.
+    log_g_err_p : float, optional
+        Plus-error of log(g). Default: None.
+    log_g_err_m : float, optional
+        Minus-error of log(g). Default: None.
+    v_rot : float, optional
+        Surface rotational velocity. Default: None.
+    v_rot_err_p : float, optional
+        Plus-error of v_rot. Default: None.
+    v_rot_err_m : float, optional
+        Minus-error of v_rot. Default: None.
+    feh : float, optional
+        Surface metallicity [Fe/H]. Default: None.
+    feh_err_p : float, optional
+        Plus-error of metallicity. Default: None.
+    feh_err_m : float, optional
+        Minus-error of metallicity. Default: None.
+    luminosity : float, optional
+        Luminosity. Default: None.
+    luminosity_err_p : float, optional
+        Plus-error of L. Default: None.
+    luminosity_err_m : float, optional
+        Minus-error of L. Default: None.
+    rad : float, optional
+        Radius in solar units. Default: None.
+    rad_err_p : float, optional
+        Plus-error of radius. Default: None.
+    rad_err_m : float, optional
+        Minus-error of radius. Default: None.
+    frequencies_list : Union[str, Path], optional
+        Text file containing list of observed frequencies.
+        Default: None.
     """
 
     num_of_stars = 0
