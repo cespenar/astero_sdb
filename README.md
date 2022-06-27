@@ -1,27 +1,39 @@
 # astero_sdb
 
 ***
-Tools for asteroseismology of sdB stars using MESA and GYRE models.
+_astero_sdb_ is the library containing the set of tools for
+asteroseismology of sdB stars using the
+[grid](https://sdb-grid-viewer.herokuapp.com) of evolutionary
+MESA models and pulsation GYRE models of sdB stars calculated for
+the [ARDASTELLA](https://ardastella.up.krakow.pl/) research group.
+
+## Content
+
+***
+The package consists of five modules:
+
+* #### `sdb_grid_reader.py`
+* #### `star.py`
+* #### `gyre_reader.py`
+* #### `utils.py`
+* #### `plots.py`
+
+Detailed docstrings are provided for all methods and functions, except for
+functions in `plots.py` (TBD).
 
 ## Installation
 
 ***
-Install by cloning the repository, `cd` into it and then execute
+The package can be installed using pip and GitHub repository:
 
-    pip install .
+    pip install git+https://github.com/cespenar/astero_sdb.git
 
-to install the package on your system.
-
-## Uninstallation
-
-***
-Uninstall by executing
-
-    pip uninstall astero_sdb
+It will be added to PyPI with the next large release.
 
 ## Basic usage
 
 ***
+
 ### Read the grid of models:
 
 ```python
@@ -33,7 +45,7 @@ grid_dir = Path('/Volumes/T3_2TB/sdb/grid_sdb')
 g = SdbGrid(database, grid_dir)
 ```
 
-where `database` is a SQLite database with the processed grid,
+where `database` is a SQLite database containing the processed grid,
 `grid_dir` the directory containing compressed models, and `g` is the read grid
 as an `SdbGrid` object.
 
@@ -75,8 +87,17 @@ target.evaluate_chi2(df_selected=df,
                      results_file_name=f'{target.name}_results.txt')
 ```
 
+where `target` contains the properties of the target star as a Star object,
+`database` is a SQLite database containing the processed grid,
+`grid_dir` the directory containing compressed models, `g` is the read grid
+as an `SdbGrid` object, and `conditions` are sample constraints put on the
+grid.
+
 ## Acknowledgements
 
 ***
 The author was financially supported by the Polish National Science Centre
-grant UMO-2017/26/E/ST9/00703.
+grant UMO-2017/26/E/ST9/00703. The grid of models was calculated using the
+resources provided by
+[Wrocław Centre for Networking and Supercomputing](https://www.wcss.pl/en/),
+grant No. 265.
