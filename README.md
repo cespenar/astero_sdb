@@ -1,7 +1,7 @@
-# astero_sdb
+# Astero-sdB
 
 ***
-_astero_sdb_ is the library containing the set of tools for
+_Astero-sdB_ is the library containing the set of tools for
 asteroseismology of sdB stars using the
 [grid](https://sdb-grid-viewer.herokuapp.com) of evolutionary
 MESA models and pulsation GYRE models of sdB stars calculated for
@@ -12,14 +12,27 @@ the [ARDASTELLA](https://ardastella.up.krakow.pl/) research group.
 ***
 The package consists of five modules:
 
-* #### `sdb_grid_reader.py`
-* #### `star.py`
-* #### `gyre_reader.py`
-* #### `utils.py`
-* #### `plots.py`
+1. #### `sdb_grid_reader.py`
+The module allows to read the processed grid and store it as the `SdbGrid`
+class. The structure provides methods to extract and read evolutionary
+and pulsation models.
 
-Detailed docstrings are provided for all methods and functions, except for
-functions in `plots.py` (TBD).
+2. #### `star.py`
+The module contains the `Star` class, which includes observational properties
+of a target star. The class contains methods for fitting a star to the grid.
+
+3. #### `gyre_reader.py`
+The tool for reading output of the GYRE pulsation code and store it in the
+`GyreData` class. The module is useful for any GYRE models and its application
+is not limited to the sdB grid.
+
+4. #### `utils.py`
+Various stand-alone utility functions.
+
+5. #### `plots.py`
+The most common plots useful during fitting target stars
+to the grid of models. In general, not recommended for publication, but
+excellent for quick analysis of the results.
 
 ## Installation
 
@@ -29,6 +42,8 @@ The package can be installed using pip and GitHub repository:
     pip install git+https://github.com/cespenar/astero_sdb.git
 
 It will be added to PyPI with the next large release.
+
+The package was tested with Python 3.9 and 3.10.
 
 ## Basic usage
 
@@ -90,7 +105,7 @@ target.evaluate_chi2(df_selected=df,
 where `target` contains the properties of the target star as a Star object,
 `database` is a SQLite database containing the processed grid,
 `grid_dir` the directory containing compressed models, `g` is the read grid
-as an `SdbGrid` object, and `conditions` are sample constraints put on the
+as an `SdbGrid` object, and `conditions` are sample constraints imposed on the
 grid.
 
 ## Acknowledgements

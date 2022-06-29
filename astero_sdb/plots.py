@@ -31,6 +31,59 @@ def plot_hr_logg_teff(targets: list[Star],
                       y_lim: tuple = None,
                       save_pdf: bool = True,
                       save_eps: bool = False) -> None:
+    """
+    Plots logg vs. Teff diagram.
+
+    Parameters
+    ----------
+    targets : list[Star]
+        List of target stars.
+    star_name : str
+        Name of the star printed in the plot.
+    df : DataFrame
+        Pandas DataFrame containing the constrained grid.
+    column : str
+        Name of a column containing S^2 data used to select the best models.
+    out_folder : Path
+        Output directory.
+    number_of_models : int, optional
+        Maximum number of fitted models considered for plotting using the
+        color scale. Default: 50.
+    sigma_range : int, optional
+        Maximum value of sigma up to which the error rectangles are plotted.
+        Default: 3.
+    threshold_chi2 : float | None, optional
+        If specified, the maximum value of S^2 considered for plotting using
+        the color scale. Default: None.
+    threshold_chi2_mp : float | None, optional
+        If specified, the maximum value of S^2, expressed as a multiplier of
+        S^2_min, considered for plotting using the color scale. Default: None.
+    print_name : bool, optional
+        If True, prints the name of the star in the plot. Default: True.
+    label_x : float | None, optional
+        If specified, the x-coordinate (Teff) of the label containg the name
+        of the star. Default: None.
+    label_y : float | None, optional
+        If specified, the y-coordinate (logg) of the label containg the name of
+        the star. Default: None.
+    x_lim : tuple | None, optional
+        If specified, the range of the x-axis (Teff). If None, the range is
+        determined automatically. Default: None.
+    y_lim : tuple | None, optional
+        If specified, the range of the y-axis (logg). If None, the range is
+        determined automatically. Default: None.
+    save_pdf : bool, optional
+        If True, saves a plot as a pdf file. Default: True.
+    save_eps : bool, optional
+        If True, saves a plot as an eps file. Please note that the plot uses
+         transparency, which is not supported by the eps standard.
+         Default: False.
+
+    Returns
+    -------
+
+    """
+
     plt.figure()
     plt.gca().invert_xaxis()
     plt.gca().invert_yaxis()
@@ -105,6 +158,26 @@ def _plot_target_logg_teff(target: Star,
                            error_color: str,
                            marker_size: float = 5,
                            plot_error: bool = False) -> None:
+    """
+    Plots a single target star in the logg vs. Teff plot.
+
+    Parameters
+    ----------
+    target : Star
+        Target star.
+    style : str
+        Marker style.
+    error_color : str
+        Color of the error bar.
+    marker_size : float, optional
+        Size of the marker. Default: 5.
+    plot_error : bool, optional
+        If True, plots the error bar of the target. Default: False.
+
+    Returns
+    -------
+
+    """
     plt.plot(target.t_eff / 1000.0, target.log_g,
              style, ms=marker_size, label=target.name)
     if plot_error:
@@ -117,6 +190,25 @@ def _plot_target_logg_teff(target: Star,
 def _plot_error_box_logg_teff(star: Star,
                               color: str,
                               sigma: int = 1) -> None:
+    """
+
+    Parameters
+    ----------
+    A helper function to plot error rectangles of the target star in the
+    logg vs. Teff plot.
+
+    star : Star
+        Target star.
+    color : str
+        Color of the error rectangles.
+    sigma : int, optional
+        Value of sigma for which the error rectangle is plotted. Default: 1.
+
+    Returns
+    -------
+
+    """
+
     box = Rectangle(((star.t_eff - sigma * star.t_eff_err_m) / 1000.0,
                      star.log_g - sigma * star.log_g_err_m),
                     sigma * (star.t_eff_err_p + star.t_eff_err_m) / 1000.0,
@@ -138,6 +230,45 @@ def save_best_info(star_name: str,
                    threshold_chi2_mp: float = None,
                    calculate_age_sdb: bool = False,
                    calculate_m_core: bool = False) -> None:
+    """
+    Saves a file containing parameters of the best models, based on the
+    selected number of best models or S^2 thresholds.
+
+    Parameters
+    ----------
+    star_name : str
+        Name of the star printed in the plot.
+    df : DataFrame
+        Pandas DataFrame containing the constrained grid.
+    column : str
+        Name of a column containing S^2 data used to select the best models.
+    out_folder : Path
+        Output directory.
+    grid : SdbGrid
+        SdbGrid object containing the grid.
+    number_of_models : int | None, optional
+        If specified, maximum number of models for which the parameters are
+        saved. If None, all models within the specified S^2 threshold are
+         taken into account. Default: None.
+    threshold_chi2 : float | None, optional
+        If specified, the maximum value of S^2 considered for selecting the
+        models. Default: None.
+    threshold_chi2_mp : float | None, optional
+        If specified, the maximum value of S^2, expressed as a multiplier of
+        S^2_min, considered for selecting the models. Default: None.
+    calculate_age_sdb : bool, optional
+        If True, calculates and saves the age on the extreme horizontal branch.
+        Default: False.
+    calculate_m_core : bool, optional
+        If True, calculates and saves the mass of the core, defined as a sum of
+        the mass of the convective core and the mass of the natural
+        semiconvective zone (c.f. Ostrowski et al. 2021). Default: False.
+
+    Returns
+    -------
+
+    """
+
     chi2_min = df[f'{column}'].min()
 
     if threshold_chi2:
@@ -242,6 +373,47 @@ def plot_modes(star: Star,
                star_name: str = None,
                save_pdf: bool = True,
                save_eps: bool = False) -> None:
+    """
+    Plots selected observed periods vs. theoretical periods from GYRE models
+    for all models selected by specifying the number of best models
+    or S^2 threshold.
+
+    Parameters
+    ----------
+    star : Star
+        Target star.
+    df : DataFrame
+        Pandas DataFrame containing the constrained grid.
+    grid : SdbGrid
+        SdbGrid object containing the grid.
+    grid_dest_dir : Path
+        Temporary directory for the extracted pulsation model.
+    column : str
+        Name of a column containing S^2 data used to select the best models.
+    out_folder : Path
+        Output directory.
+    number_of_models : int, optional
+        Maximum number of models for which the periods are plotted.
+        Default: 50.
+    threshold_chi2_mp : float | None, optional
+        If specified, the maximum value of S^2, expressed as a multiplier of
+        S^2_min, considered for selecting the models for which the periods
+        are plotted. Default: None.
+    x_lim : tuple, optional
+        The range of the x-axis (P) in seconds. Default: (0, 10000.0).
+    star_name : str | None, optional
+        If specified, the name of the star used as a label in the plot. If None
+        automatically derived from the `star` parameter. Default: None.
+    save_pdf : bool, optional
+        If True, saves a plot as a pdf file. Default: True.
+    save_eps : bool, optional
+        If True, saves a plot as an eps file. Default: False.
+
+    Returns
+    -------
+
+    """
+    
     chi2_min = df[f'{column}'].min()
     if threshold_chi2_mp:
         number_of_models = len(
@@ -284,6 +456,42 @@ def _plot_modes_single_model(star: Star,
                              legend_loc: str = None,
                              save_pdf: bool = True,
                              save_eps: bool = False) -> None:
+    """
+    Plots selected observed periods vs. theoretical periods for a single GYRE
+    model.
+
+    Parameters
+    ----------
+    star : Star
+        Target star.
+    puls_data : GyreData
+        Pulsation model as a GyreData object.
+    model : Series
+        Data for a single evolutionary model corresponding to the considered
+        pulsation model.
+    col : str
+        Name of a column containing S^2 data used to select the best models.
+    output : Path
+        Path of the output file.
+    x_lim : tuple, optional
+        The range of the x-axis (P) in seconds.
+    star_name : str
+        The name of the star
+    plot_legend : bool, optional
+        If True, plots the legend. Default: False.
+    legend_loc : str | None, optional
+        If specified, location of the legend in the descriptive Matplotlib
+        format. Default: None.
+    save_pdf : bool, optional
+        If True, saves a plot as a pdf file. Default: True.
+    save_eps : bool, optional
+        If True, saves a plot as an eps file. Default: False.
+
+    Returns
+    -------
+
+    """
+
     periods = star.periods_explicit()[0]
     degrees = np.sort(np.unique([p['l'] for p in periods.values()]))
 
