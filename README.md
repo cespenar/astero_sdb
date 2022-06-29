@@ -37,13 +37,20 @@ excellent for quick analysis of the results.
 ## Installation
 
 ***
-The package can be installed using pip and GitHub repository:
+First, install the _mesa_reader_, which is not available in PyPi:
+
+    pip install git+https://github.com/wmwolf/py_mesa_reader.git
+
+Then, _Astero-sdB_ can be installed using pip:
 
     pip install git+https://github.com/cespenar/astero_sdb.git
 
-It will be added to PyPI with the next large release.
+Unfortunately, the package cannot be currently added to PyPI, because the
+author of _mesa-reader_ has not yet uploaded it to PyPi. Installing from GitHub
+using _pip_ is not supported during uploading a package to PyPi or during
+the installation of requirements.
 
-The package was tested with Python 3.9 and 3.10.
+_Astero-sdB_ was tested with Python 3.9 and 3.10.
 
 ## Basic usage
 

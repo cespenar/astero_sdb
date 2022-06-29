@@ -413,7 +413,7 @@ def plot_modes(star: Star,
     -------
 
     """
-    
+
     chi2_min = df[f'{column}'].min()
     if threshold_chi2_mp:
         number_of_models = len(
