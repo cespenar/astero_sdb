@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'astero_sdb'
-version = '0.1.1'
+version = '0.1.2'
 description = 'Tools for asteroseismology of sdB stars using MESA and GYRE models'
 readme = 'README.md'
 authors = [{ name = 'Jakub Ostrowski', email = 'cespenar1@gmail.com' }]
@@ -25,7 +25,7 @@ dependencies = [
     'fonttools',
     'kiwisolver',
     'matplotlib',
-    'mesa-reader @ git+https://github.com/wmwolf/py_mesa_reader.git',
+    'mesa-reader',
     'numpy',
     'packaging',
     'pandas',
