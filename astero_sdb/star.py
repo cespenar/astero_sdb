@@ -621,25 +621,33 @@ class Star:
         return p_min, p_max
 
     @staticmethod
-    def calc_feh(z: float) -> float:
+    def calc_feh(z: float,
+                 solar_h1: float = 0.7154,
+                 solar_h2: float = 1.43e-5,
+                 solar_he3: float = 4.49e-5,
+                 solar_he4: float = 0.2702551) -> float:
         """Calculates [Fe/H] from metallicity.
-        Assumes solar chemical composition from Asplund et al. (2009).
+        By default, assumes solar chemical composition from
+        Asplund et al. (2009).
 
         Parameters
         ----------
         z : float
             Metallicity.
+        solar_h1 : float, optional
+            Solar H1 abundance. Default: 0.7154.
+        solar_h2 : float, optional
+            Solar deuterium abundance. Default: 1.43e-5.
+        solar_he3 : float, optional
+            Solar He3 abundance. Default: 4.49e-5.
+        solar_he4 : float, optional
+            Solar He4 abundance. Default: 0.2702551.
 
         Returns
         ----------
         float
             Calculated [Fe/H].
         """
-
-        solar_h1 = 0.7154
-        solar_h2 = 1.43e-5
-        solar_he3 = 4.49e-5
-        solar_he4 = 0.2702551
 
         solar_x = solar_h1 + solar_h2
         solar_y = solar_he3 + solar_he4
@@ -651,8 +659,7 @@ class Star:
     def chi2_single(x_model: np.array,
                     x_obs: float,
                     sigma: float) -> np.ndarray:
-        """Calculates a single component of chi^2
-        function.
+        """Calculates a single component of chi^2 function.
 
         Parameters
         ----------
