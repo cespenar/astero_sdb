@@ -45,10 +45,11 @@ Then, _Astero-sdB_ can be installed using pip:
 
     pip install git+https://github.com/cespenar/astero_sdb.git
 
-Unfortunately, the package cannot be currently added to PyPI, because the
-author of _mesa-reader_ has not yet uploaded it to PyPi. Installing from GitHub
-using _pip_ is not supported during uploading a package to PyPi or during
-the installation of requirements.
+Unfortunately, the package cannot be currently uploaded to PyPI, because one
+of its dependencies, _mesa-reader_, is not yet been available on PyPi.
+Installing from GitHub using _pip_ is not supported during uploading a
+package to PyPi or during the installation of requirements, hence the more
+cumbersome installation is currently required.
 
 _Astero-sdB_ was tested with Python 3.9 and 3.10.
 
