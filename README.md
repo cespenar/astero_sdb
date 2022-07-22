@@ -4,7 +4,7 @@
 _Astero-sdB_ is the library containing the set of tools for
 asteroseismology of sdB stars using the
 [grid](https://sdb-grid-viewer.herokuapp.com) of evolutionary
-MESA models and pulsation GYRE models of sdB stars calculated for
+MESA models and pulsation GYRE models calculated for
 the [ARDASTELLA](https://ardastella.up.krakow.pl/) research group.
 
 ## Content
@@ -31,7 +31,7 @@ Various stand-alone utility functions.
 
 5. #### `plots.py`
 The most common plots useful during fitting target stars
-to the grid of models. In general, not recommended for publication, but
+to the grid of models. Not recommended for publication, but
 excellent for quick analysis of the results.
 
 ## Installation
