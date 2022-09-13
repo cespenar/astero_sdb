@@ -51,7 +51,7 @@ Installing from GitHub using _pip_ is not supported during uploading a
 package to PyPi or during the installation of requirements, hence the more
 cumbersome installation is currently required.
 
-_Astero-sdB_ was tested with Python 3.9 and 3.10.
+_Astero-sdB_ requires Python 3.10.
 
 ## Basic usage
 

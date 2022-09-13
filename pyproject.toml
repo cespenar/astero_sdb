@@ -4,7 +4,7 @@ build-backend = 'setuptools.build_meta'
 
 [project]
 name = 'astero_sdb'
-version = '0.1.7'
+version = '0.1.8'
 description = 'Tools for asteroseismology of sdB stars using MESA and GYRE models'
 readme = 'README.md'
 authors = [{ name = 'Jakub Ostrowski', email = 'cespenar1@gmail.com' }]

@@ -1,6 +1,5 @@
 from copy import deepcopy
 from pathlib import Path
-from typing import Union
 
 import numpy as np
 from pandas.core.frame import DataFrame
@@ -52,7 +51,7 @@ class Star:
         Plus-error of radius. Default: None.
     rad_err_m : float, optional
         Minus-error of radius. Default: None.
-    frequencies_list : Union[str, Path], optional
+    frequencies_list : str | Path, optional
         Text file containing list of observed frequencies.
         Default: None.
     """
@@ -79,7 +78,7 @@ class Star:
                  rad: float = None,
                  rad_err_p: float = None,
                  rad_err_m: float = None,
-                 frequencies_list: Union[str, Path] = None):
+                 frequencies_list: str | Path = None):
         """Creates a Star object using provided observational data.
 
         Parameters
@@ -122,7 +121,7 @@ class Star:
             Plus-error of radius. Default: None.
         rad_err_m : float, optional
             Minus-error of radius. Default: None.
-        frequencies_list : Union[str, Path], optional
+        frequencies_list : str | Path, optional
             Text file containing list of observed frequencies.
             Default: None.
         """
