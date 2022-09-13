@@ -1,15 +1,15 @@
 cycler==0.11.0
-fonttools==4.33.3
-kiwisolver==1.4.3
-matplotlib==3.5.2
+fonttools==4.37.1
+kiwisolver==1.4.4
+matplotlib==3.5.3
 mesa-reader @ git+https://github.com/wmwolf/py_mesa_reader.git@95d93540130db87c30dfba7d81670e79ef6a3826
-numpy==1.23.0
+numpy==1.23.3
 packaging==21.3
-pandas==1.4.3
-Pillow==9.1.1
+pandas==1.4.4
+Pillow==9.2.0
 pyparsing==3.0.9
 python-dateutil==2.8.2
-pytz==2022.1
+pytz==2022.2.1
 six==1.16.0
-SQLAlchemy==1.4.39
-tqdm==4.64.0
+SQLAlchemy==1.4.41
+tqdm==4.64.1
